@@ -1,0 +1,1179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A nine-door escape room that reviews the principles of design, with a puzzle and a Canva task behind every door.">
+<title>The Locked Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Karla:wght@400;600;700&display=swap">
+<style>
+/* Layout concept: a dim studio hallway. Nine arched doors in three rows (the P1/P2/P3 groupings),
+   a nine-tile code strip above them, a bright paper workbench for each puzzle, and a teal "In Canva" panel
+   that sends students out to do real work in Canva. */
+:root{
+  --bg:#10142a;
+  --panel:#1a2040;
+  --panel-2:#252c58;
+  --line:#37406f;
+  --text:#ece9f8;
+  --muted:#a9a7c8;
+  --violet:#b08df0;
+  --brand:#6027a8;
+  --accent:#e07b39;
+  --ok:#4fd1a5;
+  --ok-bg:#12302f;
+  --teal:#3cc4b0;
+  --teal-bg:#122f3a;
+  --paper:#f5f0fd;
+  --ink:#1c2340;
+  --paper-line:#d9d1ec;
+  --display:"Fraunces", Georgia, "Times New Roman", serif;
+  --body:"Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--text);font:16px/1.5 var(--body);
+  padding-block:24px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.top>div:first-child{min-width:0;flex:1 1 360px}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:clamp(2.1rem,6vw,3.5rem);line-height:1.05;font-weight:700;margin-top:6px}
+.lede{color:var(--muted);max-width:58ch;margin-top:10px}
+.meter{display:flex;gap:22px}
+.meter div{display:flex;flex-direction:column}
+.lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.meter b{font:700 1.7rem var(--display);font-variant-numeric:tabular-nums}
+
+.codebar{display:grid;grid-template-columns:repeat(9,1fr);gap:clamp(4px,1.2vw,10px)}
+.cell{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.tile{width:100%;aspect-ratio:1;display:grid;place-items:center;border:1.5px dashed var(--line);border-radius:6px;font:700 clamp(1.2rem,4.6vw,2rem) var(--display);color:var(--accent)}
+.tile.on{border:1.5px solid var(--accent);background:var(--panel-2);animation:pop .45s ease}
+.cell small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+#hall{display:flex;flex-direction:column;gap:26px}
+.setup{background:var(--teal-bg);border:1px solid #28586a;border-left:4px solid var(--teal);border-radius:10px;padding:14px 18px}
+.setup summary{cursor:pointer;font:700 1.05rem var(--display);color:var(--teal)}
+.setup ol{margin:10px 0 0;padding-left:20px;display:grid;gap:4px}
+.grp-t{font:600 12px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--violet);margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.grp-t::after{content:"";height:1px;background:var(--line);flex:1}
+.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.door{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:70px 70px 10px 10px;padding:28px 18px 16px;min-height:176px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;min-width:0}
+.door:hover{border-color:var(--violet)}
+.door .knob{position:absolute;right:15px;top:58%;width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.dn{font:700 1.4rem/1.1 var(--display)}
+.dt{color:var(--muted);font-size:14px}
+.ds{margin-top:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.door.half{border-color:var(--teal)}
+.door.half .knob{background:var(--teal)}
+.door.half .ds{color:var(--teal)}
+.door.solved{background:var(--ok-bg);border-color:var(--ok)}
+.door.solved .knob{background:var(--ok)}
+.door.solved .ds{color:var(--ok)}
+
+.exit{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center}
+.exit h2{font-size:1.3rem;flex:1 1 100%}
+.exit input{flex:1 1 180px;min-width:0;background:var(--bg);color:var(--text);border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;font:700 1.2rem var(--display);letter-spacing:.3em;text-transform:uppercase}
+.exit input:disabled{opacity:.5}
+.exit .note{flex:1 1 100%;color:var(--muted);font-size:14px}
+.btn{background:var(--accent);color:#1b1208;border:0;border-radius:8px;padding:11px 18px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--violet)}
+.btn.teal{background:var(--teal);color:#06251f}
+
+.room{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:14px}
+.back{align-self:flex-start;background:none;border:0;color:var(--violet);cursor:pointer;padding:0;font-weight:600}
+.back:hover{text-decoration:underline}
+.room h2{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.05}
+.room h2:focus{outline:none}
+.steps{display:flex;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.steps span{padding:4px 10px;border:1px solid var(--line);border-radius:999px}
+.steps .cur{color:#1b1208;background:var(--accent);border-color:var(--accent)}
+.steps .ok{color:var(--ok);border-color:var(--ok)}
+.mission{max-width:62ch}
+.stage{background:var(--paper);color:var(--ink);border-radius:10px;padding:clamp(14px,3vw,24px)}
+.round{font:700 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin-bottom:12px}
+.msg{min-height:1.6em;font-weight:600;color:var(--violet)}
+.msg[data-k="ok"]{color:var(--ok)}
+.hintrow{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.hintbox{flex:1 1 260px;color:var(--muted);border-left:3px solid var(--accent);padding-left:12px}
+.win{display:flex;gap:18px;align-items:center;background:var(--ok-bg);border:1px solid var(--ok);border-radius:10px;padding:18px}
+.win>div:last-child{display:flex;flex-direction:column;gap:8px;align-items:flex-start;min-width:0}
+.win .letter{flex:none;width:76px;height:76px;display:grid;place-items:center;border:2px solid var(--accent);border-radius:8px;font:700 2.6rem var(--display);color:var(--accent);background:var(--panel-2)}
+.win h3{font-size:1.3rem;color:var(--ok)}
+
+.canva{background:var(--teal-bg);border:1px solid #28586a;border-left:4px solid var(--teal);border-radius:10px;padding:clamp(14px,3vw,22px);display:flex;flex-direction:column;gap:12px}
+.canva h3{font-size:1.4rem;color:var(--teal)}
+.canva ol{margin:0;padding-left:22px;display:grid;gap:6px}
+.canva .q{font-weight:700;margin-top:4px}
+.canva form{display:flex;gap:10px;flex-wrap:wrap}
+.canva input{flex:1 1 160px;min-width:0;background:var(--bg);color:var(--text);border:1.5px solid #28586a;border-radius:8px;padding:10px 12px;font:600 1.05rem var(--body)}
+.tbtn{background:none;border:1px dashed var(--line);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+
+.out{display:flex;flex-direction:column;gap:18px}
+.out h2{font-size:clamp(2rem,6vw,3.2rem)}
+.stats{display:flex;gap:28px;flex-wrap:wrap}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:12px}
+.sheet dt{font:700 1.05rem var(--display);color:var(--accent)}
+.sheet dd{margin:0}
+.ask{background:var(--paper);color:var(--ink);border-radius:10px;padding:18px}
+.ask h3{font-size:1.2rem;margin-bottom:6px}
+
+footer{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--muted);font-size:13px}
+footer span{max-width:60ch}
+
+/* balance */
+.scale{position:relative;height:276px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:36px;overflow:hidden}
+.beam{width:100%;max-width:560px;height:204px;border-bottom:8px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-end;transform-origin:50% 100%;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.pan{width:44%;display:flex;flex-wrap:wrap-reverse;align-items:flex-end;justify-content:center;gap:4px}
+.pivot{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:24px solid transparent;border-right:24px solid transparent;border-bottom:36px solid var(--ink)}
+.blk,.chip{display:grid;place-items:center;font:700 18px var(--display);border-radius:4px;border:0}
+.chips{display:flex;gap:12px;align-items:flex-end;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.chip{cursor:pointer;opacity:.55}
+.chip[aria-pressed="true"]{opacity:1;box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)}
+.read{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;margin-top:6px;white-space:pre}
+.sub{text-align:center;font-size:14px;color:#51567a;margin:2px 0 10px}
+
+/* contrast */
+.cposter{padding:clamp(20px,5vw,36px);border-radius:6px;transition:background .2s,color .2s;border:1px solid var(--paper-line)}
+.cposter h3{font-size:clamp(1.6rem,6vw,2.5rem);line-height:1.05;letter-spacing:.02em}
+.cposter p{margin-top:8px;font-size:1.05rem}
+.pick{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:14px}
+.pick b{font-size:13px;min-width:110px}
+.sw{width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--paper),0 0 0 6px var(--brand)}
+.sw:disabled{cursor:not-allowed;opacity:.45}
+.sw:disabled[aria-pressed="true"]{opacity:1}
+.ratio{margin-top:16px}
+.bar{height:12px;border-radius:6px;background:#d9d1ec;overflow:hidden;margin-top:6px;position:relative}
+.fill{height:100%;width:0;background:var(--brand);transition:width .25s}
+
+/* emphasis */
+.eposter{background:#fff;border:1px solid var(--paper-line);padding:26px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.el{background:none;border:1px dashed transparent;padding:6px 12px;font:700 18px var(--body);color:var(--ink);cursor:pointer;border-radius:4px;transition:all .2s}
+.el:hover{border-color:#a99bd4}
+.el.star{font:700 clamp(2rem,10vw,3.4rem)/1 var(--display);color:var(--brand)}
+.star-count{text-align:center;font-size:14px;color:#51567a;margin-top:10px}
+
+/* alignment */
+.aposter{position:relative;height:272px;background:#fff;border:1px solid var(--paper-line)}
+.aline{position:absolute;width:62%;font:600 17px/1.25 var(--body)}
+.aline.t{font:700 24px/1.1 var(--display)}
+.aline.r{text-align:right}
+.guide{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #e07b39}
+.sl{display:grid;gap:8px;margin-top:14px}
+.srow{display:grid;grid-template-columns:minmax(96px,150px) 1fr;gap:12px;align-items:center;font-size:14px;font-weight:600}
+.srow input{width:100%;accent-color:var(--brand);min-height:28px}
+
+/* unity */
+.uposter{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;align-items:center;justify-items:center;border:1px solid var(--paper-line)}
+.up{background:none;border:0;padding:8px;cursor:pointer;transition:opacity .3s,transform .3s;max-width:100%}
+.up.gone{opacity:0;transform:scale(.5);pointer-events:none}
+.up.span2{grid-column:1/-1}
+.u-head{font:700 clamp(2rem,8vw,3rem)/1 var(--display);color:#14305a}
+.u-sub{font:italic 500 1.4rem var(--display);color:#0f6e73}
+.c-star{display:block;background:#ff2e93;color:#fff;font:900 1.6rem Impact,"Arial Black",sans-serif;padding:14px 20px;transform:rotate(-9deg);clip-path:polygon(50% 0,61% 14%,79% 8%,80% 27%,98% 32%,88% 48%,98% 64%,80% 70%,79% 90%,61% 84%,50% 100%,39% 84%,21% 90%,20% 70%,2% 64%,12% 48%,2% 32%,20% 27%,21% 8%,39% 14%)}
+.c-lol{display:block;background:#b7ff00;color:#ff3b1f;font:italic 900 1.2rem "Comic Sans MS","Chalkboard SE",cursive;padding:12px 14px;text-transform:uppercase;transform:rotate(3deg)}
+.c-btn{display:block;background:#b7ff00;color:#111;font:700 1rem Arial,sans-serif;padding:14px 26px;border-radius:999px;box-shadow:6px 6px 0 #ff3b1f}
+.u2-head{font:800 clamp(1.9rem,8vw,2.8rem)/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#2f4a2a}
+.u2-sub{font:600 1.15rem var(--body);color:#6b4a2b;letter-spacing:.04em}
+.c-wed{display:block;font:italic 400 2rem "Brush Script MT","Snell Roundhand",cursive;color:#d6336c;transform:rotate(-4deg)}
+.c-sale{display:block;background:#7a1cff;color:#fff;font:900 1.5rem Impact,"Arial Black",sans-serif;padding:12px 18px;transform:rotate(6deg);box-shadow:5px 5px 0 #ffe600}
+.c-neon{display:block;background:#00e5ff;color:#001;font:700 1.1rem "Courier New",monospace;padding:12px 18px;border:4px dotted #ff00c8}
+
+/* repetition */
+.rgrid{display:grid;gap:12px;max-width:380px;margin:0 auto}
+.rgrid.c3{grid-template-columns:repeat(3,1fr)}
+.rgrid.c4{grid-template-columns:repeat(4,1fr);max-width:460px}
+.ic{aspect-ratio:1;background:#fff;border:2px solid var(--brand);border-radius:16px;color:var(--brand);cursor:pointer;display:grid;place-items:center;padding:12px}
+.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.odd{border-radius:3px}
+.ic.odd svg{stroke-width:3.4}
+.cc{aspect-ratio:3/2;background:#fff;border:2px solid var(--brand);border-radius:10px;color:var(--ink);cursor:pointer;display:grid;place-items:center;font:700 14px var(--body);padding:4px}
+.cc.odd{font:italic 500 16px Georgia,"Times New Roman",serif}
+.bd{aspect-ratio:1;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;font:700 1.3rem var(--display);color:#fff;background:#6027a8}
+.bd.odd{background:#3d55d6}
+.ic:hover,.cc:hover{background:#efe8fb}
+
+/* movement */
+.mgrid{display:grid;gap:8px;margin:0 auto}
+.mc{aspect-ratio:1;display:grid;place-items:center;position:relative;min-width:0}
+.mt{width:100%;height:100%;background:#fff;border:2px solid #c9bdeb;border-radius:10px;cursor:pointer;display:grid;place-items:center;padding:0}
+.mt svg{width:58%;height:58%;transition:transform .25s;fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mt.lit{border-color:var(--brand);background:#e9ddfa}
+.mt.lit svg{stroke:var(--brand)}
+.tag{position:absolute;top:3px;left:5px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);pointer-events:none}
+.dot{width:7px;height:7px;border-radius:50%;background:#cfc6e8}
+.goal{width:100%;height:100%;background:var(--brand);color:#fff;border-radius:10px;display:grid;place-items:center;font:700 13px var(--body);text-align:center;padding:4px}
+.goal.on{background:var(--ok);color:#06251c}
+
+/* pattern */
+.pgrid{display:grid;gap:6px;margin:0 auto}
+.pc{aspect-ratio:1;background:#fff;border:1.5px solid var(--paper-line);border-radius:6px;cursor:pointer;display:grid;place-items:center;padding:6px}
+.pc.blank{border-style:dashed;border-color:#9588c4;background:transparent}
+.pc svg{width:100%;height:100%}
+
+/* proximity */
+.menu{background:#fff;border:1px solid var(--paper-line);max-width:380px;margin:0 auto;padding:20px 22px 12px}
+.menu h3{text-align:center;font-size:1.9rem;letter-spacing:.04em;margin-bottom:4px}
+.menu .tag2{text-align:center;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#51567a;margin-bottom:10px}
+.ml{display:flex;justify-content:space-between;gap:12px;font-size:16px;font-variant-numeric:tabular-nums}
+.gapbtn{display:flex;align-items:center;justify-content:center;width:100%;border:0;background:transparent;padding:0;cursor:pointer;transition:height .25s;height:16px}
+.gapbtn.loose{height:46px}
+.gapbtn span{font-size:11px;font-weight:700;color:var(--brand);border:1px dashed #a99bd4;border-radius:999px;padding:0 9px;line-height:16px;background:#fff}
+.gapbtn:hover span{background:#efe8fb}
+
+
+/* balance with pull = weight x distance */
+.tscale{position:relative;height:276px;padding-top:36px;max-width:560px;margin:0 auto}
+.tbeam{transform-origin:50% 154px;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.trow{display:grid;grid-template-columns:repeat(9,1fr);height:150px;align-items:end;gap:3px}
+.tcell{display:flex;align-items:flex-end;justify-content:center;height:100%;min-width:0;padding:0;background:none;border:0}
+.tcell .bb{width:84%;display:grid;place-items:center;font:700 16px var(--display);border-radius:3px}
+.tcell.slot{cursor:pointer}
+.tcell.slot:empty{height:56px;align-self:end;background:#efe8fb;border:1px dashed #a99bd4;border-bottom:0;border-radius:4px 4px 0 0}
+.tcell.slot:hover:empty{background:#e3d8f8}
+.tbar{height:8px;background:var(--ink);border-radius:2px}
+.tlab{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;text-align:center;font-size:12px;font-weight:700;color:#51567a;height:24px;padding-top:4px}
+.pivot2{position:absolute;top:204px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:24px solid transparent;border-right:24px solid transparent;border-bottom:36px solid var(--ink)}
+.chip{width:46px;height:46px;border-radius:50%;opacity:1}
+.chip:disabled{opacity:.25;cursor:not-allowed}
+.chip[aria-pressed="true"]{box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)}
+
+/* contrast roles */
+.cposter .c2s{margin-top:8px;font-size:1.1rem}
+.cposter .c2f{margin-top:10px;font-size:.8rem}
+.pick b{min-width:150px}
+.mk{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.mk.pass{color:#0b6b45}.mk.fail{color:#b3261e}
+
+/* alignment audit */
+.aposter{height:300px}
+.au{position:absolute;background:none;border:1px solid transparent;padding:0 2px;font:600 15px var(--body);color:var(--ink);cursor:pointer;white-space:nowrap;border-radius:3px}
+.au.card{background:#efe8fb;border:1px solid #b7a6dc;white-space:normal;display:grid;place-items:center;padding:0}
+.au.flag{outline:3px solid var(--accent);outline-offset:1px}
+.guide2{position:absolute;pointer-events:none}
+.guide2.left{top:0;bottom:0;left:27px;border-left:2px dashed #e07b39}
+.guide2.top{left:0;right:0;top:100px;border-top:2px dashed #e07b39}
+.guide2.center{top:0;bottom:0;left:50%;border-left:2px dashed #e07b39}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+
+/* unity brand kit */
+.kit{background:#fff;border:1px solid var(--paper-line);border-left:4px solid var(--brand);padding:8px 12px;font-size:14px;margin-bottom:8px}
+.up.picked{outline:3px solid var(--accent);outline-offset:2px}
+.why{margin-top:12px;background:#fff;border:1px solid var(--paper-line);padding:10px 12px;border-radius:8px}
+.why .btn.ghost{color:var(--ink);border-color:#a99bd4}
+
+/* repetition sort */
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bin{background:#fff;border:1px solid var(--paper-line);border-radius:8px;padding:10px;min-width:0}
+.bin.b0{grid-column:1/-1;background:#f0ebfa;border-style:dashed}
+.bin h4{margin:0 0 8px;font:700 12px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.binbox{display:flex;flex-wrap:wrap;gap:6px;min-height:36px}
+.sortchip{background:#efe8fb;border:1px solid #b7a6dc;border-radius:999px;padding:6px 12px;font:600 14px var(--body);color:var(--ink);cursor:pointer}
+.sortchip:hover{background:#e3d8f8}
+
+/* movement checkpoints, pattern question, proximity levels */
+.mt.chk{border-color:var(--accent)}
+.askbox{margin-top:14px;text-align:center}
+.q2{font-weight:700;margin-bottom:8px}
+.opts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pc.opt{width:64px;height:64px;aspect-ratio:auto}
+.gapbtn.tight{height:14px}
+.gapbtn.medium{height:30px}
+.gapbtn.loose{height:52px}
+@media (max-width:600px){.bins{grid-template-columns:1fr}.pick b{flex:1 1 100%}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}50%{transform:translateX(6px)}80%{transform:translateX(-3px)}}
+
+@media (max-width:600px){
+  .doors{grid-template-columns:1fr}
+  .door{min-height:116px;border-radius:44px 44px 10px 10px;padding:22px 18px 14px}
+  .door .knob{top:auto;bottom:18px}
+  .win{flex-direction:column;align-items:flex-start}
+  .c-star{font-size:1.25rem;padding:12px 14px}
+  .c-btn{padding:12px 16px;box-shadow:4px 4px 0 #ff3b1f}
+  .c-sale{font-size:1.25rem;padding:10px 12px}
+  .u-sub{font-size:1.15rem}
+  .up{padding:4px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<noscript><p style="padding:24px;color:#ece9f8;background:#10142a;font:16px sans-serif">The Locked Studio needs JavaScript. Please turn it on and reload.</p></noscript>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">Principles of Design · Unit review</p>
+      <h1>The Locked Studio</h1>
+      <p class="lede">Nine doors stand between you and the exit, one for each principle of design. Each door has a puzzle on this page and a task in Canva. Finish both to earn a letter. The nine letters are scrambled, so unscramble them to get the code.</p>
+    </div>
+    <div class="meter" aria-label="Progress">
+      <div><span class="lbl">Time</span><b id="clock">0:00</b></div>
+      <div><span class="lbl">Hints used</span><b id="hints">0</b></div>
+    </div>
+  </header>
+
+  <section class="codebar" id="codebar" aria-label="Code letters"></section>
+
+  <main id="hall"></main>
+  <section id="room" class="room" hidden></section>
+  <section id="escape" class="out" hidden></section>
+
+  <footer>
+    <span id="ver">Work in pairs. The clock starts when you open your first door. Progress saves in this browser, so you can finish on another day.</span>
+    <button class="btn ghost" id="reset" type="button">Start over</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+function h(tag, a){
+  var e = document.createElement(tag), k, v, kids = Array.prototype.slice.call(arguments, 2);
+  a = a || {};
+  for(k in a){
+    v = a[k];
+    if(k.indexOf('on') === 0 && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  kids.forEach(function add(c){
+    if(c == null) return;
+    if(Array.isArray(c)) return c.forEach(add);
+    e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  });
+  return e;
+}
+function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function rnd(n){ return Math.floor(Math.random() * n); }
+function shuffle(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pick(arr, n){ return shuffle(arr).slice(0, n); }
+function lum(hex){
+  var c = [1,3,5].map(function(i){ return parseInt(hex.slice(i, i+2), 16) / 255; })
+    .map(function(v){ return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2];
+}
+function ratio(a, b){ var x = lum(a), y = lum(b); return (Math.max(x,y) + 0.05) / (Math.min(x,y) + 0.05); }
+
+/* ---------- state ---------- */
+var KEY = 'locked-studio-v2';
+var TEACHER = location.hash === '#teacher';
+function fresh(){ return {solved:{}, puz:{}, hinted:{}, v:rnd(3), start:0, done:false, end:0}; }
+function load(){
+  try{ var v = localStorage.getItem(KEY); if(v){ var s = JSON.parse(v); if(s && s.solved && s.puz) return s; } }catch(e){}
+  return fresh();
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+var S = load();
+
+/* ---------- round runner ---------- */
+function runRounds(st, api, n, make){
+  var i = 0, label = h('p', {class:'round'}), box = h('div', {});
+  st.append(label, box);
+  function go(){
+    label.textContent = 'Round ' + (i + 1) + ' of ' + n;
+    box.replaceChildren();
+    var fired = false;
+    make(i, box, function(){
+      if(fired) return; fired = true;
+      if(i === n - 1){ api.say('Puzzle complete. On to the Canva task.', 'ok'); setTimeout(api.puzzleDone, 1100); }
+      else { api.say('Round ' + (i + 1) + ' cleared. The next one is harder.', 'ok'); setTimeout(function(){ i++; api.say(''); go(); }, 1300); }
+    });
+  }
+  go();
+}
+
+/* ---------- puzzles ---------- */
+function wcol(w){
+  var m = {1:['#9aa5d8','#1c2340'],2:['#f2c14e','#1c2340'],3:['#2ba58f','#1c2340'],4:['#e07b39','#1c2340'],5:['#d6558f','#fff'],6:['#6027a8','#fff'],7:['#3a6ea5','#fff']};
+  return m[w];
+}
+function bstyle(w){ var c = wcol(w); return 'height:' + (14 + w * 11) + 'px;background:' + c[0] + ';color:' + c[1]; }
+
+/* Balance: pull = weight x distance from the center */
+function buildBalance(st, api){
+  var R = [
+    {left:[[6,3]], tray:[6,4,3,2], use:0},
+    {left:[[5,4],[2,1]], tray:[6,5,4,3,2,1], use:0},
+    {left:[[4,4],[3,2],[2,3]], tray:[7,6,5,3,2,1], use:3}
+  ];
+  runRounds(st, api, R.length, function(i, box, next){
+    var cfg = R[i], placed = [0,0,0,0], sel = 0, done = false, chipEls = [], rightCells = [];
+    var TL = cfg.left.reduce(function(a, b){ return a + b[0] * b[1]; }, 0), leftAt = {};
+    cfg.left.forEach(function(b){ leftAt[b[1]] = b[0]; });
+    var row = h('div', {class:'trow'}), lab = h('div', {class:'tlab'}), read = h('p', {class:'read'});
+    for(var c = 0; c < 9; c++){
+      (function(c){
+        var d = Math.abs(c - 4), cell;
+        if(c < 4){ cell = h('div', {class:'tcell'}); if(leftAt[d]) cell.append(h('div', {class:'bb', style:bstyle(leftAt[d])}, leftAt[d])); }
+        else if(c === 4){ cell = h('div', {class:'tcell'}); }
+        else {
+          cell = h('button', {class:'tcell slot', type:'button', 'aria-label':'Place at distance ' + d});
+          cell.addEventListener('click', function(){
+            if(done) return;
+            var j = d - 1;
+            if(placed[j]) placed[j] = 0;
+            else if(sel){ placed[j] = sel; sel = 0; }
+            else { api.say('Pick a block from the tray first.'); return; }
+            paint();
+          });
+          rightCells[d - 1] = cell;
+        }
+        row.append(cell); lab.append(h('span', {}, c === 4 ? '' : String(d)));
+      })(c);
+    }
+    var beam = h('div', {class:'tbeam'}, row, h('div', {class:'tbar'}), lab);
+    var tray = h('div', {class:'chips'});
+    cfg.tray.forEach(function(w){
+      var ch = h('button', {class:'chip', type:'button', 'data-w':w, 'aria-pressed':'false', 'aria-label':'Block of weight ' + w, style:'background:' + wcol(w)[0] + ';color:' + wcol(w)[1]}, w);
+      ch.addEventListener('click', function(){ if(done) return; sel = sel === w ? 0 : w; paint(); });
+      chipEls.push(ch); tray.append(ch);
+    });
+    function paint(){
+      var TR = 0, n = 0, used = {};
+      placed.forEach(function(w, j){ if(w){ TR += w * (j + 1); n++; used[w] = 1; } });
+      rightCells.forEach(function(cell, j){ cell.replaceChildren(); if(placed[j]) cell.append(h('div', {class:'bb', style:bstyle(placed[j])}, placed[j])); });
+      chipEls.forEach(function(ch){ var w = +ch.getAttribute('data-w'); ch.disabled = !!used[w]; ch.setAttribute('aria-pressed', sel === w ? 'true' : 'false'); });
+      beam.style.transform = 'rotate(' + Math.max(-10, Math.min(10, (TR - TL) * 0.5)) + 'deg)';
+      read.textContent = 'Left pull ' + TL + '     Right pull ' + TR;
+      if(TR === TL && n > 0){
+        if(cfg.use && n !== cfg.use) api.say('Level, but this beam needs exactly ' + cfg.use + ' blocks on the right.');
+        else if(!done){ done = true; api.say('Level. Weight times distance matched on both sides.', 'ok'); next(); }
+      } else if(n > 0) api.say(TR > TL ? 'The right side pulls harder.' : 'The left side pulls harder.');
+    }
+    box.append(h('p', {class:'sub'}, 'A block’s pull is its weight times its distance from the center. Tap a block in the tray, then tap a spot on the right.' + (cfg.use ? ' Use exactly ' + cfg.use + ' blocks.' : '')),
+      h('div', {class:'tscale'}, beam, h('div', {class:'pivot2'})), read, tray);
+    paint();
+  });
+}
+
+/* Contrast: three text roles, each with its own minimum ratio */
+function buildContrast(st, api){
+  var ROLES = [['Headline', 3], ['Subhead', 4.5], ['Fine print', 7]];
+  var R = [
+    {bg:'#1c2340', t:'SUMMER FILM NIGHT', pal:[['#f5f0fd','Lavender'],['#ffffff','White'],['#e8d44d','Yellow'],['#e07b39','Orange'],['#2ba58f','Teal'],['#8c8c8c','Grey']]},
+    {bg:'#e8d44d', t:'BAKE SALE FRIDAY', pal:[['#1c2340','Navy'],['#000000','Black'],['#6027a8','Purple'],['#14532d','Forest'],['#e07b39','Orange'],['#8c8c8c','Grey']]},
+    {bg:'#6027a8', t:'ROBOTICS CLUB', pal:[['#ffffff','White'],['#f5f0fd','Lavender'],['#e8d44d','Yellow'],['#e07b39','Orange'],['#2ba58f','Teal'],['#1c2340','Navy']]}
+  ];
+  runRounds(st, api, R.length, function(i, box, next){
+    var cfg = R[i], chosen = [-1,-1,-1], done = false;
+    var head = h('h3', {}, cfg.t), sub = h('p', {class:'c2s'}, 'Free on the lawn. Gates open at 7:30 pm.'), fine = h('p', {class:'c2f'}, 'Rain date is Sunday. Bring a blanket. No glass bottles.');
+    var els = [head, sub, fine], marks = [], rows = [];
+    var poster = h('div', {class:'cposter', style:'background:' + cfg.bg + ';color:#7d7f93'}, head, sub, fine);
+    function update(){
+      var allPass = true, distinct = true;
+      ROLES.forEach(function(r, ri){
+        var ci = chosen[ri];
+        Array.prototype.forEach.call(rows[ri].querySelectorAll('.sw'), function(x, k){ x.setAttribute('aria-pressed', k === ci ? 'true' : 'false'); });
+        if(ci < 0){ allPass = false; marks[ri].textContent = ''; return; }
+        var q = ratio(cfg.bg, cfg.pal[ci][0]);
+        els[ri].style.color = cfg.pal[ci][0];
+        marks[ri].textContent = q.toFixed(1) + ' : 1  ' + (q >= r[1] ? 'passes' : 'too low');
+        marks[ri].className = 'mk ' + (q >= r[1] ? 'pass' : 'fail');
+        if(q < r[1]) allPass = false;
+        chosen.forEach(function(o, rj){ if(rj !== ri && o === ci) distinct = false; });
+      });
+      if(allPass && distinct && !done){ done = true; api.say('All three roles are readable, with three different colors.', 'ok'); next(); }
+      else if(allPass && !distinct) api.say('Every role passes, but two share a color. Use three different colors.');
+      else if(!done) api.say('');
+    }
+    ROLES.forEach(function(r, ri){
+      var mark = h('span', {class:'mk'}); marks.push(mark);
+      var row = h('div', {class:'pick', role:'group', 'aria-label':r[0]}, h('b', {}, r[0] + ': ' + r[1] + ' to 1'));
+      cfg.pal.forEach(function(c, ci){
+        var s = h('button', {class:'sw', type:'button', style:'background:' + c[0], 'aria-label':r[0] + ' ' + c[1], 'aria-pressed':'false'});
+        s.addEventListener('click', function(){ if(done) return; chosen[ri] = ci; update(); });
+        row.append(s);
+      });
+      row.append(mark); rows.push(row);
+    });
+    box.append(h('p', {class:'sub'}, 'The background is fixed. Choose a text color for each role. Small text needs more contrast than big text.'), poster);
+    rows.forEach(function(r){ box.append(r); });
+    update();
+  });
+}
+
+/* Emphasis: rank by importance using four text sizes */
+function buildEmphasis(st, api){
+  var TIERS = ['Small','Medium','Large','Extra large'], SIZE = [15, 19, 26, 40];
+  var R = [
+    {t:'Jazz Night poster', items:[
+      ['JAZZ NIGHT',3,3,'The event name is the main message. It should be the only Extra large item.'],
+      ['Sat, Nov 14 · 8 pm',2,2,'People need the date and time next. Make them Large.'],
+      ['Riverside Hall',1,2,'The place matters, but it ranks below the date.'],
+      ['Tickets $12',1,2,'Price is useful, but it ranks below the date.'],
+      ['Live quartet',0,1,'This is a supporting detail. Keep it small or medium.'],
+      ['Free parking after 6',0,0,'This is the least important line. Make it Small.']]},
+    {t:'Bake sale flyer', items:[
+      ['BAKE SALE',3,3,'The event name is the main message. It should be the only Extra large item.'],
+      ['Friday, 3:15 pm',2,2,'The day and time come next. Make them Large.'],
+      ['Cafeteria',1,2,'The place matters, but it ranks below the time.'],
+      ['Cookies 50 cents',1,2,'Prices help, but they rank below the time.'],
+      ['Brownies $1',1,2,'Prices help, but they rank below the time.'],
+      ['All money helps the garden club',0,1,'This is a supporting detail. Keep it small or medium.']]},
+    {t:'Fire drill notice', items:[
+      ['DRILL AT 10:15 TODAY',3,3,'The time and the event are the main message. Make them the only Extra large item.'],
+      ['Line up by classroom',2,2,'This is the action everyone must take. Make it Large.'],
+      ['Stay quiet in the hallway',1,2,'An important rule, but it ranks below the action.'],
+      ['Teachers bring the red folder',0,1,'This detail is for teachers. Keep it small or medium.'],
+      ['Questions? Ask the office',0,1,'A supporting detail. Keep it small or medium.'],
+      ['Thank you!',0,0,'This is the least important line. Make it Small.']]}
+  ];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], done = false, tier = [], btns = [];
+    var order = shuffle(cfg.items.map(function(_, i){ return i; }));
+    do { tier = cfg.items.map(function(it){ return rnd(3); }); } while(cfg.items.every(function(it, i){ return tier[i] >= it[1] && tier[i] <= it[2]; }));
+    var poster = h('div', {class:'eposter'}), info = h('p', {class:'star-count'});
+    function paint(){
+      btns.forEach(function(b, i){ b.style.fontSize = SIZE[tier[i]] + 'px'; b.classList.toggle('star', tier[i] === 3); b.setAttribute('aria-label', cfg.items[i][0] + ', ' + TIERS[tier[i]]); });
+      var bad = -1, why = '';
+      cfg.items.forEach(function(it, i){ if(bad < 0 && (tier[i] < it[1] || tier[i] > it[2])){ bad = i; why = it[3]; } });
+      var xl = tier.filter(function(t){ return t === 3; }).length;
+      info.textContent = 'Extra large items: ' + xl;
+      if(bad < 0 && !done){ done = true; api.say('A clear order. Your eye moves from the main message down to the details.', 'ok'); next(); }
+      else if(!done) api.say(xl > 1 ? 'More than one Extra large item competes. Only the main message should lead.' : why);
+    }
+    order.forEach(function(i){
+      var b = h('button', {class:'el', type:'button'}, cfg.items[i][0]);
+      btns[i] = b;
+      b.addEventListener('click', function(){ if(done) return; tier[i] = (tier[i] + 1) % 4; paint(); });
+      poster.append(b);
+    });
+    box.append(h('p', {class:'sub'}, cfg.t + '. Tap a line to step its size up: Small, Medium, Large, Extra large. Size each line by how much it matters.'), poster, info);
+    paint();
+    api.say('');
+  });
+}
+
+/* Alignment: audit near-misses */
+function buildAlignment(st, api){
+  var LINES = ['Open Studio Night','Thursday, 6 to 8 pm','Room 214','Bring a sketchbook','Snacks provided','Sign up at the desk','Parking in Lot B','Doors open 5:45','Questions? Ask the office'];
+  var DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var R = [
+    {mode:'left', n:9, bad:{2:7,5:-6,7:9}, note:'These nine lines should share one left edge. Three sit a few pixels off. Flag them.'},
+    {mode:'top', n:7, bad:{1:8,4:-7,6:6}, note:'These cards should share one top edge. Three sit slightly off. Flag them.'},
+    {mode:'center', n:8, bad:{0:-9,3:7,6:-6}, note:'These lines should all be centered on one axis. Three drift off it. Flag them.'}
+  ];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], done = false, flags = {}, badKeys = Object.keys(cfg.bad);
+    var poster = h('div', {class:'aposter'});
+    var guide = h('div', {class:'guide2 ' + cfg.mode, hidden:''});
+    poster.append(guide);
+    for(var i = 0; i < cfg.n; i++){
+      (function(i){
+        var off = cfg.bad[i] || 0, b;
+        if(cfg.mode === 'left') b = h('button', {class:'au', type:'button', style:'top:' + (14 + i * 30) + 'px;left:' + (24 + off) + 'px'}, LINES[i]);
+        else if(cfg.mode === 'top') b = h('button', {class:'au card', type:'button', style:'width:12%;height:70px;left:' + (2 + i * 13.8) + '%;top:' + (100 + off) + 'px'}, DAYS[i]);
+        else b = h('button', {class:'au', type:'button', style:'top:' + (14 + i * 32) + 'px;left:50%;transform:translateX(calc(-50% + ' + off + 'px))'}, LINES[i]);
+        b.addEventListener('click', function(){ if(done) return; flags[i] = !flags[i]; b.classList.toggle('flag', !!flags[i]); b.setAttribute('aria-pressed', flags[i] ? 'true' : 'false'); });
+        poster.append(b);
+      })(i);
+    }
+    var ruler = h('button', {class:'btn ghost', type:'button'}, 'Show ruler');
+    ruler.addEventListener('click', function(){ guide.hidden = !guide.hidden; ruler.textContent = guide.hidden ? 'Show ruler' : 'Hide ruler'; });
+    var check = h('button', {class:'btn', type:'button'}, 'Check my flags');
+    check.addEventListener('click', function(){
+      if(done) return;
+      var f = Object.keys(flags).filter(function(k){ return flags[k]; });
+      var right = f.filter(function(k){ return cfg.bad[k] != null; }).length, wrong = f.length - right;
+      if(right === badKeys.length && wrong === 0){ done = true; api.say('Found all three near-misses.', 'ok'); next(); }
+      else api.say(right + ' of ' + badKeys.length + ' real misalignments flagged' + (wrong ? ', and ' + wrong + ' flagged ' + (wrong === 1 ? 'is' : 'are') + ' actually fine.' : '. Keep looking.'));
+    });
+    box.append(h('p', {class:'sub'}, cfg.note), poster, h('div', {class:'btnrow'}, ruler, check));
+  });
+}
+
+/* Unity: remove the clash, then name the brand rule it breaks */
+function buildUnity(st, api){
+  var cup = '<svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#0f6e73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h34v16a14 14 0 0 1-14 14h-6A14 14 0 0 1 12 38z"/><path d="M46 26h4a7 7 0 0 1 0 14h-5"/><path d="M22 10c-3 3 3 5 0 8M32 10c-3 3 3 5 0 8"/></svg>';
+  var wave = '<svg width="150" height="52" viewBox="0 0 150 52" fill="none" stroke="#0f6e73" stroke-width="3" stroke-linecap="round"><path d="M4 14q9-10 18 0t18 0 18 0 18 0 18 0 18 0 18 0"/><path d="M4 28q9-10 18 0t18 0 18 0 18 0 18 0 18 0 18 0" stroke="#14305a"/><path d="M4 42q9-10 18 0t18 0 18 0 18 0 18 0 18 0 18 0"/></svg>';
+  var tree = '<svg width="60" height="70" viewBox="0 0 60 70" fill="none" stroke="#2f4a2a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M30 6L12 30h10L8 50h44L38 30h10z"/><path d="M30 50v14"/></svg>';
+  var tent = '<svg width="80" height="64" viewBox="0 0 80 64" fill="none" stroke="#6b4a2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 58L40 8l34 50z"/><path d="M40 8v50M28 58l12-22 12 22"/></svg>';
+  var RULES = {color:'Color palette', type:'Typeface', shape:'Shape style', mood:'Mood'};
+  var R = [
+    {bg:'#e3f0ef', kit:'Brand kit: navy, teal and sea-foam. One serif typeface. Soft, wavy lines. Calm mood.', pieces:[
+      ['fit','span2','u-head','Harbor Coffee',null,'Harbor Coffee headline'],
+      ['fit','','',null,wave,'wave lines'],
+      ['clash','','c-star','NEW!!!',null,'pink NEW starburst',['color','shape','mood']],
+      ['fit','','u-sub','Open daily, 7 to 3',null,'opening hours'],
+      ['clash','','c-lol','Best coffee ever lol',null,'neon BEST COFFEE EVER LOL banner',['color','type','mood']],
+      ['fit','','',null,cup,'coffee cup drawing'],
+      ['clash','','c-btn','CLICK HERE',null,'lime CLICK HERE button',['color','shape','mood']]]},
+    {bg:'#edf0df', kit:'Brand kit: forest green and bark brown. One bold sans typeface. Simple outdoor line drawings. Friendly, earthy mood.', pieces:[
+      ['fit','span2','u2-head','Camp Cedar',null,'Camp Cedar headline'],
+      ['clash','','c-wed','Save the date',null,'pink script Save the date',['type','color','mood']],
+      ['fit','','',null,tree,'pine tree drawing'],
+      ['fit','','u2-sub','Canoes, hikes and s’mores',null,'activities line'],
+      ['clash','','c-sale','50% OFF!!!',null,'purple 50% OFF sticker',['color','type','mood']],
+      ['fit','','',null,tent,'tent drawing'],
+      ['clash','','c-neon','ENTER NOW',null,'cyan ENTER NOW box',['color','type','shape']]]}
+  ];
+  runRounds(st, api, R.length, function(i, box, next){
+    var cfg = R[i], gone = 0, total = 3, done = false, current = null;
+    var info = h('p', {class:'star-count'}, 'Clashing pieces removed: 0 of 3');
+    var poster = h('div', {class:'uposter', style:'background:' + cfg.bg});
+    var why = h('div', {class:'why', hidden:''}), whyT = h('p', {class:'sub'}, '');
+    var btnRow = h('div', {class:'btnrow'});
+    Object.keys(RULES).forEach(function(k){
+      var rb = h('button', {class:'btn ghost why-b', type:'button'}, RULES[k]);
+      rb.addEventListener('click', function(){
+        if(!current || done) return;
+        var p = current.p;
+        if(p[6].indexOf(k) > -1){
+          current.b.classList.add('gone'); gone++; current = null; why.hidden = true;
+          info.textContent = 'Clashing pieces removed: ' + gone + ' of ' + total;
+          if(gone === total){ done = true; api.say('Calm and consistent. Every piece follows the brand kit.', 'ok'); next(); }
+          else api.say('Right. That piece breaks the brand kit.', 'ok');
+        } else { shake(why); api.say('Compare that piece with the brand kit again. Which rule does it break most clearly?'); }
+      });
+      btnRow.append(rb);
+    });
+    why.append(whyT, btnRow);
+    shuffle(cfg.pieces).forEach(function(p){
+      var inner = h('span', {class:p[2]}, p[3]);
+      if(p[4]) inner.innerHTML = p[4];
+      var b = h('button', {class:'up ' + p[1], type:'button', 'data-kind':p[0], 'aria-label':'Piece: ' + p[5]}, inner);
+      if(p[1]) b.style.order = '-1';
+      b.addEventListener('click', function(){
+        if(done || b.classList.contains('gone')) return;
+        Array.prototype.forEach.call(poster.querySelectorAll('.up'), function(x){ x.classList.remove('picked'); });
+        if(p[0] === 'clash'){
+          current = {p:p, b:b}; b.classList.add('picked');
+          whyT.textContent = 'Which brand rule does this piece break most clearly?';
+          why.hidden = false; api.say('');
+        } else { current = null; why.hidden = true; shake(b); api.say('That piece follows the brand kit. Look for one that does not.'); }
+      });
+      poster.append(b);
+    });
+    box.append(h('p', {class:'kit'}, cfg.kit), h('p', {class:'sub'}, 'Three pieces break the kit. Tap one, then name the rule it breaks.'), poster, info, why);
+  });
+}
+
+/* Repetition: decide what repeats and what changes */
+function buildRepetition(st, api){
+  var R = [
+    {t:'A slide deck', items:[['Logo position','R'],['Title font and size','R'],['Color palette','R'],['Page number spot','R'],['Background style','R'],['Photo on the slide','C'],['Headline wording','C'],['Chart data','C'],['Quote text','C'],['Slide topic','C']]},
+    {t:'A school website', items:[['Menu bar location','R'],['Button style','R'],['Link color','R'],['Footer layout','R'],['Heading font','R'],['Page photos','C'],['Article text','C'],['Page title wording','C'],['Event dates','C'],['Featured banner image','C']]},
+    {t:'A comic book', items:[['Panel border style','R'],['Main character’s look','R'],['Speech bubble style','R'],['Lettering font','R'],['Color palette','R'],['Facial expressions','C'],['Scenery behind the action','C'],['Dialogue words','C'],['Camera angle of each panel','C'],['Sound effect words','C']]}
+  ];
+  var BINS = ['Not sorted yet', 'Repeat on every page', 'Change on every page'];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], done = false, where = cfg.items.map(function(){ return 0; }), order = shuffle(cfg.items.map(function(_, i){ return i; }));
+    var cols = BINS.map(function(b, k){ return h('div', {class:'bin b' + k}, h('h4', {}, b), h('div', {class:'binbox'})); });
+    var chips = [];
+    function paint(){
+      cols.forEach(function(c){ c.querySelector('.binbox').replaceChildren(); });
+      order.forEach(function(i){ cols[where[i]].querySelector('.binbox').append(chips[i]); });
+    }
+    order.forEach(function(i){
+      var b = h('button', {class:'sortchip', type:'button'}, cfg.items[i][0]);
+      b.addEventListener('click', function(){ if(done) return; where[i] = where[i] === 1 ? 2 : 1; paint(); });
+      chips[i] = b;
+    });
+    var check = h('button', {class:'btn', type:'button'}, 'Check my sort');
+    check.addEventListener('click', function(){
+      if(done) return;
+      if(where.indexOf(0) > -1){ api.say('Sort every item first. Tap an item to move it between the boxes.'); return; }
+      var right = cfg.items.filter(function(it, i){ return (it[1] === 'R' ? 1 : 2) === where[i]; }).length;
+      if(right === cfg.items.length){ done = true; api.say('Perfect sort. Structure repeats, content changes.', 'ok'); next(); }
+      else api.say(right + ' of ' + cfg.items.length + ' are in the right box. Ask: if this changed on every page, would it feel inconsistent?');
+    });
+    box.append(h('p', {class:'sub'}, cfg.t + '. Repetition keeps a design consistent. Tap each item to sort it: what should repeat on every page, and what should change?'),
+      h('div', {class:'bins'}, cols), h('div', {class:'btnrow'}, check));
+    paint();
+  });
+}
+
+/* Movement: plan a route through the arrows */
+function buildMovement(st, api){
+  var DIRS = {U:[0,-1], R:[1,0], D:[0,1], L:[-1,0]}, ORDER = ['U','R','D','L'];
+  var arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg>';
+  var R = [
+    {cols:5, rows:4, path:[[0,0,'D'],[0,1,'R'],[1,1,'R'],[2,1,'D'],[2,2,'R'],[3,2,'D']], goal:[3,3], decoys:[[4,0],[1,3]], checks:[]},
+    {cols:5, rows:4, path:[[0,3,'U'],[0,2,'R'],[1,2,'U'],[1,1,'R'],[2,1,'R'],[3,1,'U'],[3,0,'R']], goal:[4,0], decoys:[[2,2],[4,3],[2,0],[1,0]], checks:[]},
+    {cols:5, rows:4, full:true, start:[0,0], goal:[4,3], checks:[[1,2,'Image'],[3,1,'Subhead']]}
+  ];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], done = false, state = {}, tiles = {}, start = cfg.full ? cfg.start : cfg.path[0], chk = {};
+    cfg.checks.forEach(function(c){ chk[c[0] + ',' + c[1]] = c[2]; });
+    var goalEl = h('div', {class:'goal'}, 'Sign up');
+    var grid = h('div', {class:'mgrid', style:'grid-template-columns:repeat(' + cfg.cols + ',1fr);max-width:' + (cfg.cols * 92) + 'px'});
+    if(cfg.full){
+      for(var yy = 0; yy < cfg.rows; yy++) for(var xx = 0; xx < cfg.cols; xx++) if(!(xx === cfg.goal[0] && yy === cfg.goal[1])) state[xx + ',' + yy] = rnd(4);
+    } else {
+      cfg.path.forEach(function(p){ state[p[0] + ',' + p[1]] = (ORDER.indexOf(p[2]) + 1 + rnd(3)) % 4; });
+      cfg.decoys.forEach(function(p){ state[p[0] + ',' + p[1]] = rnd(4); });
+    }
+    function walk(){
+      var x = start[0], y = start[1], lit = [], n, k, d;
+      for(n = 0; n < 40; n++){
+        k = x + ',' + y;
+        if(!tiles[k] || lit.indexOf(k) > -1) break;
+        lit.push(k);
+        d = DIRS[ORDER[state[k]]]; x += d[0]; y += d[1];
+        if(x === cfg.goal[0] && y === cfg.goal[1]) return {lit:lit, won:true};
+      }
+      return {lit:lit, won:false};
+    }
+    function update(initial){
+      var r = walk();
+      Object.keys(tiles).forEach(function(k){
+        var t = tiles[k];
+        t.classList.toggle('lit', r.lit.indexOf(k) > -1);
+        t.firstChild.style.transform = 'rotate(' + (state[k] * 90) + 'deg)';
+        t.setAttribute('data-dir', ORDER[state[k]]);
+      });
+      var missed = Object.keys(chk).filter(function(k){ return r.lit.indexOf(k) < 0; }).map(function(k){ return chk[k]; });
+      goalEl.classList.toggle('on', r.won && !missed.length);
+      if(r.won && !missed.length && !done){ done = true; api.say('The eye passes every stop and lands on the button. That is movement.', 'ok'); next(); }
+      else if(r.won && missed.length) api.say('You reached the button but skipped: ' + missed.join(', ') + '. Route the eye through them first.');
+      else if(!initial && !done) api.say('The eye path travels through ' + r.lit.length + ' tile' + (r.lit.length === 1 ? '' : 's') + ' and then stops.');
+    }
+    for(var y = 0; y < cfg.rows; y++) for(var x = 0; x < cfg.cols; x++){
+      (function(x, y){
+        var k = x + ',' + y, cell = h('div', {class:'mc'});
+        if(x === cfg.goal[0] && y === cfg.goal[1]) cell.append(goalEl);
+        else if(state[k] != null){
+          var t = h('button', {class:'mt' + (chk[k] ? ' chk' : ''), type:'button', 'aria-label':'Arrow tile, tap to rotate'});
+          t.innerHTML = arrow;
+          t.addEventListener('click', function(){ if(done) return; state[k] = (state[k] + 1) % 4; update(false); });
+          t.setAttribute('data-xy', k); tiles[k] = t; cell.append(t);
+          if(x === start[0] && y === start[1]) cell.append(h('span', {class:'tag'}, 'Headline'));
+          else if(chk[k]) cell.append(h('span', {class:'tag'}, chk[k]));
+        } else cell.append(h('span', {class:'dot'}));
+        grid.append(cell);
+      })(x, y);
+    }
+    var note = cfg.full ? 'Every tile is an arrow. Plan a route from the headline to the button that passes through the labeled stops. Tap a tile to turn it.' : 'Tap a tile to turn its arrow. Lit tiles show where the eye travels from the headline.';
+    box.append(h('p', {class:'sub'}, note), grid);
+    update(true);
+  });
+}
+
+/* Pattern: complete it, then extend the rule */
+function buildPattern(st, api){
+  var S4 = [
+    '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#6027a8"/></svg>',
+    '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="8" width="24" height="24" fill="#e07b39"/></svg>',
+    '<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,7 33,32 7,32" fill="#2ba58f"/></svg>',
+    '<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,6 34,20 20,34 6,20" fill="#d6a21e"/></svg>'
+  ];
+  var R = [
+    {R:4, C:5, k:3, blanks:6, wrongs:1, f:function(r, c){ return (r + c) % 3; }, ask:[10, 8], note:'Fill the empty squares and fix the tile that breaks the rhythm. Tap a square to change its shape.'},
+    {R:4, C:6, k:4, blanks:7, wrongs:2, f:function(r, c){ return (r + 2 * c) % 4; }, ask:[11, 9], note:'Four shapes this time. Find the rule, fill the gaps and fix the wrong tiles.'},
+    {R:5, C:6, k:3, blanks:8, wrongs:2, f:function(r, c){ return (Math.floor(c / 2) + r) % 3; }, ask:[9, 14], note:'The rhythm repeats in pairs. Fill the gaps and fix the wrong tiles.'}
+  ];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], gridDone = false, done = false, vals = [], cells = [], n = cfg.R * cfg.C;
+    var grid = h('div', {class:'pgrid', style:'grid-template-columns:repeat(' + cfg.C + ',1fr);max-width:' + (cfg.C * 70) + 'px'});
+    var idx = pick(Array.apply(null, Array(n)).map(function(_, i){ return i; }), cfg.blanks + cfg.wrongs);
+    var askBox = h('div', {class:'askbox', hidden:''});
+    function expected(i){ return cfg.f(Math.floor(i / cfg.C), i % cfg.C); }
+    function paint(i){ var v = vals[i]; cells[i].classList.toggle('blank', v < 0); cells[i].innerHTML = v < 0 ? '' : S4[v]; cells[i].setAttribute('data-k', v); }
+    function check(){
+      var off = 0; vals.forEach(function(v, i){ if(v !== expected(i)) off++; });
+      if(off === 0){
+        gridDone = true; api.say('The grid is complete. One more question.', 'ok');
+        var ans = cfg.f(cfg.ask[0] - 1, cfg.ask[1] - 1);
+        askBox.hidden = false;
+        askBox.append(h('p', {class:'q2'}, 'The rule keeps going past the edge of the grid. Which shape sits in row ' + cfg.ask[0] + ', column ' + cfg.ask[1] + '?'),
+          h('div', {class:'opts'}, S4.slice(0, cfg.k).map(function(s, k){
+            var b = h('button', {class:'pc opt', type:'button', 'aria-label':'Shape option ' + (k + 1)});
+            b.innerHTML = s;
+            b.addEventListener('click', function(){
+              if(done) return;
+              if(k === ans){ done = true; api.say('Yes. You found the rule, not just the picture.', 'ok'); next(); }
+              else { shake(b); api.say('Not that one. Write the rule in words, then count forward from the grid.'); }
+            });
+            return b;
+          })));
+      } else api.say(off + ' tile' + (off === 1 ? ' is' : 's are') + ' still off the pattern.');
+    }
+    for(var i = 0; i < n; i++){
+      (function(i){
+        var pos = idx.indexOf(i);
+        vals[i] = pos < 0 ? expected(i) : (pos < cfg.blanks ? -1 : (expected(i) + 1 + rnd(cfg.k - 1)) % cfg.k);
+        var b = h('button', {class:'pc', type:'button', 'aria-label':'Pattern tile ' + (i + 1)});
+        cells[i] = b;
+        b.addEventListener('click', function(){ if(gridDone) return; vals[i] = vals[i] < 0 ? 0 : (vals[i] + 1) % cfg.k; paint(i); check(); });
+        paint(i); grid.append(b);
+      })(i);
+    }
+    box.append(h('p', {class:'sub'}, cfg.note), grid, askBox);
+  });
+}
+
+/* Proximity: three levels of space */
+function buildProximity(st, api){
+  var R = [
+    {title:'CASA VERDE', tag:'Trattoria', groups:[[['Bruschetta','$8'],['Tomato soup','$7']],[['Wood-fired pizza','$14'],['Fresh pasta','$16']],[['Open 11 to 9 daily',''],['212 Poplar Ave','']]]},
+    {title:'SPRING CONCERT', tag:'Family night', groups:[[['Friday, May 8',''],['Doors open 6:30 pm',''],['Show starts 7 pm','']],[['School auditorium',''],['Free parking in Lot B','']],[['Tickets $5',''],['Kids under 5 free','']]]},
+    {title:'BOOK FAIR', tag:'In the library', groups:[[['All week, Mon to Fri',''],['Before and after school','']],[['Books $1 to $5','']],[['Buy two, get one free',''],['Cash or card','']],[['Room 108',''],['Ask at the front desk','']]]}
+  ];
+  var LV = ['tight','medium','loose'];
+  runRounds(st, api, R.length, function(ri, box, next){
+    var cfg = R[ri], done = false, lines = [], gid = [];
+    cfg.groups.forEach(function(g, gi){ g.forEach(function(l){ lines.push(l); gid.push(gi); }); });
+    // gap 0 = after the title block; gap i+1 = between line i and line i+1
+    var want = [function(v){ return v >= 1; }].concat(lines.slice(0, -1).map(function(_, i){ var between = gid[i] !== gid[i + 1]; return function(v){ return between ? v === 2 : v === 0; }; }));
+    var gaps;
+    do { gaps = want.map(function(){ return rnd(3); }); } while(gaps.filter(function(v, j){ return !want[j](v); }).length < 3);
+    var btns = [];
+    function gapBtn(j, label){
+      var g = h('button', {class:'gapbtn ' + LV[gaps[j]], type:'button', 'aria-label':'Space ' + label + ', currently ' + LV[gaps[j]] + '. Tap to change.'}, h('span', {}, '↕ ' + LV[gaps[j]]));
+      g.addEventListener('click', function(){
+        if(done) return;
+        gaps[j] = (gaps[j] + 1) % 3; g.className = 'gapbtn ' + LV[gaps[j]]; g.firstChild.textContent = '↕ ' + LV[gaps[j]];
+        if(gaps.every(function(v, k){ return want[k](v); })){ done = true; api.say('Closer means related. Each group reads at a glance.', 'ok'); next(); }
+        else api.say('Closer means more related. Lines in a group are tightest, groups are separated by the most space, and the title gets at least a medium gap.');
+      });
+      btns.push(g); return g;
+    }
+    var menu = h('div', {class:'menu'}, h('h3', {}, cfg.title), h('p', {class:'tag2'}, cfg.tag), gapBtn(0, 'under the title'));
+    lines.forEach(function(l, i){
+      menu.append(h('div', {class:'ml'}, h('span', {}, l[0]), h('span', {}, l[1])));
+      if(i < lines.length - 1) menu.append(gapBtn(i + 1, 'between ' + l[0] + ' and ' + lines[i + 1][0]));
+    });
+    box.append(h('p', {class:'sub'}, 'Tap a space to cycle it: tight, medium, loose. Use space to show which lines belong together.'), menu);
+  });
+}
+
+/* ---------- Canva tasks (numbers change by student version v = 0, 1 or 2) ---------- */
+var CANVA = {
+  balance: function(v){
+    var P = [[200,100],[300,150],[160,60]][v], ans = 1000 - P[1] - P[0];
+    return {
+      steps:['Add a new page to your 1000 × 1000 px design.',
+        'Add a square from Elements, then Shapes.',
+        'Select it, open Position, then Advanced. Set Width and Height to ' + P[0] + ', X to ' + P[1] + ' and Y to 400.',
+        'Add a second identical square on the right. Place it so the page is perfectly symmetrical, left to right.'],
+      q:'What X value did you give the second square?', num:ans,
+      hint:'The space between the right edge of the second square and the right edge of the page must equal ' + P[1] + '.'};
+  },
+  contrast: function(v){
+    var D = [['a soft dark copy of the letters behind them','shadow'],['letters drawn as outlines with a see-through middle','hollow'],['letters that glow like a lit sign','neon']][v];
+    return {
+      steps:['Add a new page. Set the background to a photo: open Photos and search for ocean.',
+        'Add a text box that says CONTRAST in white, size 100.',
+        'Select the text, then open Effects in the top toolbar.',
+        'Find the effect that makes ' + D[0] + '.'],
+      q:'What is the name of that effect?', any:v === 0 ? ['shadow'] : v === 1 ? ['hollow','outline'] : ['neon','glow'],
+      hint:'Hover over the effect tiles. Each one has a name under it.', show:D[1]};
+  },
+  emphasis: function(v){
+    var B = [14,16,18][v];
+    return {
+      steps:['Add a new page.',
+        'Add a text box with a headline of your choice and a second text box with one line of body text.',
+        'Set the body text to size ' + B + ' using the size box in the top toolbar (the number beside the font name).',
+        'Make the headline exactly four times as big as the body text, so it clearly leads.'],
+      q:'What font size did you give the headline?', num:4 * B,
+      hint:'Multiply the body size by 4.'};
+  },
+  alignment: function(v){
+    var W = [400,500,640][v], ans = (1000 - W) / 2;
+    return {
+      steps:['Add a new page and one text box.',
+        'Select it, open Position, then Advanced. Set Width to ' + W + '.',
+        'Still in Position, find the buttons that align the element to the page. Choose the one that centers it left to right.',
+        'Look at the X value in Advanced.'],
+      q:'What X value does Canva show now?', num:ans,
+      hint:'Centered means equal space on both sides: (1000 − ' + W + ') ÷ 2.'};
+  },
+  unity: function(v){
+    var T = [[6,4],[7,5],[8,5]][v], ans = T[0] - T[1] + 1;
+    return {
+      steps:['Add a new page and put ' + T[0] + ' separate elements on it (shapes or text boxes).',
+        'Select ' + T[1] + ' of them: hold Shift and click each one, or drag a box around them.',
+        'Group them into one unit. Use the Group button that appears, or press Ctrl+G (Cmd+G on a Mac).',
+        'Select any element, then open Position and find the Layers tab.'],
+      q:'How many layers are listed now?', num:ans,
+      hint:'A group counts as one layer. Add the leftover separate elements to it.'};
+  },
+  repetition: function(v){
+    var P = [[5,100,50,100],[6,80,40,60],[4,120,60,40]][v], N = P[0], W = P[1], G = P[2], X0 = P[3];
+    return {
+      steps:['Add a new page and one square. Set Width and Height to ' + W + ', X to ' + X0 + ' and Y to 400.',
+        'Duplicate the square (Ctrl+D or Cmd+D) until you have ' + N + ' squares in a row.',
+        'Space them so each square starts ' + (W + G) + ' px to the right of the one before it.',
+        'Select the last square and read its X value in Position, then Advanced.'],
+      q:'What is the X value of the last square?', num:X0 + (N - 1) * (W + G),
+      hint:'Each step adds ' + (W + G) + '. Take ' + (N - 1) + ' steps from ' + X0 + '.'};
+  },
+  movement: function(v){
+    var D = [['rises up from the bottom','rise'],['slowly fades in','fade'],['slides across the page sideways','pan']][v];
+    return {
+      steps:['Add a new page and a text box.',
+        'Select the text box, then click Animate in the top toolbar.',
+        'Browse the animation styles.',
+        'Find the one that makes the text ' + D[0] + '.'],
+      q:'What is the name of that animation?', any:[D[1]],
+      hint:'Click each style to preview it. The name is under each preview.', show:D[1]};
+  },
+  pattern: function(v){
+    var N = [4,5,6][v];
+    return {
+      steps:['Add a new page.',
+        'Build a ' + N + ' × ' + N + ' checkerboard of squares that alternates two colors. Make the top-left square purple.',
+        'Tip: build one row, group it, then duplicate it and flip the colors on every other row.',
+        'Count the squares that are the same color as the top-left square.'],
+      q:'How many purple squares are on your checkerboard?', num:Math.ceil(N * N / 2),
+      hint:'A checkerboard has ' + (N * N) + ' squares and the two colors take turns.'};
+  },
+  proximity: function(){
+    return {
+      steps:['Add a new page and a text box with four lines of text.',
+        'Select the text box.',
+        'In the top toolbar, click Spacing.',
+        'Read the names of the two sliders in that menu.'],
+      q:'What are the two sliders called? Type both names.', all:['letter','line'],
+      hint:'One slider changes the space between letters. The other changes the space between lines.', show:'Letter spacing and Line spacing'};
+  }
+};
+function canvaCheck(c, raw){
+  var t = String(raw).toLowerCase().trim(); if(!t) return false;
+  if(c.num != null){ var m = t.replace(/,/g, '').match(/-?\d+(\.\d+)?/); return !!m && Number(m[0]) === c.num; }
+  if(c.any) return c.any.some(function(w){ return t.indexOf(w) > -1; });
+  if(c.all) return c.all.every(function(w){ return t.indexOf(w) > -1; });
+  return false;
+}
+
+/* ---------- the nine doors ---------- */
+var PR = [
+  {id:'balance', name:'Balance', g:0, letter:'S', abbr:'Bal', teaser:'Level the beam',
+   mission:'Three beams are tilted. A block pulls with its weight times its distance from the center. Place blocks on the right so each beam sits level.',
+   hint:'Work out the left pull first. Then look for a weight and distance whose product matches it, or two products that add up to it.',
+   takeaway:'Balance spreads visual weight evenly. Unequal pieces can still balance, which is asymmetrical balance.', build:buildBalance},
+  {id:'contrast', name:'Contrast', g:0, letter:'N', abbr:'Con', teaser:'Make it readable',
+   mission:'Three posters have a fixed background. Give the headline, subhead and fine print each a text color that is readable enough for its size, using three different colors.',
+   hint:'Check each ratio. Small text needs 7 to 1, so save your highest-contrast colors for the fine print.',
+   takeaway:'Contrast is a clear difference between elements, such as light against dark, that makes content easy to read.', build:buildContrast},
+  {id:'emphasis', name:'Emphasis', g:0, letter:'E', abbr:'Emp', teaser:'Rank what matters',
+   mission:'Three posters need a clear order of importance. Resize every line so the most important message leads and the details step down.',
+   hint:'Rank the lines first. The main message is biggest, then what people must know or do next, then the extra details.',
+   takeaway:'Emphasis gives one element the lead role. When everything is emphasized, nothing is.', build:buildEmphasis},
+  {id:'alignment', name:'Alignment', g:1, letter:'D', abbr:'Ali', teaser:'Audit the edges',
+   mission:'Small misalignments are easy to miss and make a design look careless. Audit each layout and flag every line or card that sits off the shared edge.',
+   hint:'Turn on the ruler. Anything that does not touch the dashed line is a miss.',
+   takeaway:'Alignment lines elements up along a shared edge or center, so a layout feels organized.', build:buildAlignment},
+  {id:'unity', name:'Unity', g:1, letter:'S', abbr:'Uni', teaser:'Follow the brand kit',
+   mission:'Each poster has a brand kit. Find the three pieces that break it, remove them, and name the rule each one breaks.',
+   hint:'Read the brand kit, then compare each loud piece with it: color, typeface, shape and mood.',
+   takeaway:'Unity makes every part feel like one design, through shared color, type and style.', build:buildUnity},
+  {id:'repetition', name:'Repetition', g:1, letter:'R', abbr:'Rep', teaser:'Repeat or change?',
+   mission:'Repetition keeps a design consistent. For three kinds of designs, sort each element into what should repeat on every page and what should change.',
+   hint:'Ask: if this changed on every page, would the whole design feel messy? Structure and style repeat. Content changes.',
+   takeaway:'Repetition reuses the same element or style to build consistency across a design.', build:buildRepetition},
+  {id:'movement', name:'Movement', g:2, letter:'I', abbr:'Mov', teaser:'Plan the eye path',
+   mission:'Lead the viewer from the headline to the Sign up button. The first two routes are laid out for you. In the last one every tile is an arrow, so plan your own route through the stops.',
+   hint:'In the last round, plan on paper first. List the tiles from the headline, through each stop, to the button. Then turn each arrow to point at the next tile.',
+   takeaway:'Movement guides the viewer’s eye through a design along a deliberate path.', build:buildMovement},
+  {id:'pattern', name:'Pattern', g:2, letter:'E', abbr:'Pat', teaser:'Find the rule',
+   mission:'Three patterns have gaps and wrong tiles. Complete each grid, then use its rule to predict a spot far beyond the edge.',
+   hint:'Write the rule in words. Check how each row shifts from the one above, then count forward to the spot they ask about.',
+   takeaway:'Pattern is a repeated arrangement of elements that creates a predictable rhythm.', build:buildPattern},
+  {id:'proximity', name:'Proximity', g:2, letter:'G', abbr:'Pro', teaser:'Space shows groups',
+   mission:'Space shows which things belong together. On three layouts, set each gap to tight, medium or loose so related lines group and the title stands apart.',
+   hint:'Decide which lines belong together first. Tight inside groups, loose between groups.',
+   takeaway:'Proximity groups related items close together and separates unrelated ones.', build:buildProximity}
+];
+var CODE = 'DESIGNERS';
+
+/* ---------- shell ---------- */
+var hall = document.getElementById('hall'), room = document.getElementById('room'), escapeEl = document.getElementById('escape');
+var codebar = document.getElementById('codebar'), clock = document.getElementById('clock'), hintsEl = document.getElementById('hints');
+var tiles = [], doors = [], exitInput, exitBtn, exitNote, exitMsg;
+
+PR.forEach(function(p){
+  var t = h('div', {class:'tile'}, ''), cell = h('div', {class:'cell'}, t, h('small', {}, p.abbr));
+  tiles.push(t); codebar.append(cell);
+});
+
+hall.append(h('details', {class:'setup', open:''},
+  h('summary', {}, 'Before you start: set up Canva (2 minutes)'),
+  h('ol', {},
+    h('li', {}, 'Open canva.com and sign in with your school account.'),
+    h('li', {}, 'Click Create a design, then Custom size.'),
+    h('li', {}, 'Type 1000 by 1000 and choose px as the unit. Click Create new design.'),
+    h('li', {}, 'Name the file Locked Studio and add your name. Keep that tab open. Every Canva task uses this file, and you add a new page for each door.'))));
+
+var GROUPS = ['Weight & Focus', 'Order & Cohesion', 'Flow & Grouping'];
+GROUPS.forEach(function(g, gi){
+  var row = h('div', {class:'doors'});
+  PR.forEach(function(p, i){
+    if(p.g !== gi) return;
+    var d = h('button', {class:'door', type:'button'},
+      h('span', {class:'knob'}), h('span', {class:'dn'}, p.name), h('span', {class:'dt'}, p.teaser), h('span', {class:'ds'}, 'Locked'));
+    d.addEventListener('click', function(){ openRoom(i); });
+    doors[i] = d; row.append(d);
+  });
+  hall.append(h('section', {}, h('h2', {class:'grp-t'}, g), row));
+});
+
+exitInput = h('input', {id:'code', type:'text', maxlength:'9', autocomplete:'off', autocapitalize:'characters', spellcheck:'false', placeholder:'_________', 'aria-label':'Nine letter code'});
+exitBtn = h('button', {class:'btn', type:'submit'}, 'Open the exit');
+exitNote = h('p', {class:'note'});
+exitMsg = h('p', {class:'note', role:'status'});
+var form = h('form', {class:'exit'}, h('h2', {}, 'The exit'), exitInput, exitBtn, exitNote, exitMsg);
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  var v = exitInput.value.trim().toUpperCase();
+  if(v === CODE) finish();
+  else { exitMsg.textContent = 'Not the right word. Use all nine letters from the strip above. Clue: it is what you are all becoming.'; shake(form); }
+});
+hall.append(form);
+
+function count(){ return PR.filter(function(p){ return S.solved[p.id]; }).length; }
+function nHints(){ return Object.keys(S.hinted).length; }
+
+function refresh(){
+  PR.forEach(function(p, i){
+    var on = !!S.solved[p.id], half = !on && !!S.puz[p.id];
+    tiles[i].classList.toggle('on', on);
+    tiles[i].textContent = on ? p.letter : '';
+    doors[i].classList.toggle('solved', on);
+    doors[i].classList.toggle('half', half);
+    doors[i].querySelector('.ds').textContent = on ? 'Open · letter ' + p.letter : half ? 'Puzzle done · Canva next' : 'Locked';
+  });
+  var n = count();
+  exitInput.disabled = n < 9; exitBtn.disabled = n < 9;
+  exitNote.textContent = n < 9 ? 'Exit locked. ' + n + ' of 9 letters found.' : 'All nine letters found. They are scrambled. Unscramble them to spell the code.';
+  hintsEl.textContent = nHints();
+  document.getElementById('ver').textContent = 'Work in pairs. The clock starts when you open your first door. Progress saves in this browser, so you can finish on another day. Your version: ' + (S.v + 1) + ' of 3, so your numbers may differ from your neighbor’s.';
+}
+
+function tick(){
+  var end = S.done ? S.end : Date.now();
+  var t = S.start ? Math.max(0, Math.floor((end - S.start) / 1000)) : 0;
+  var hh = Math.floor(t / 3600), mm = Math.floor((t % 3600) / 60), ss = t % 60;
+  clock.textContent = (hh ? hh + ':' + String(mm).padStart(2, '0') : mm) + ':' + String(ss).padStart(2, '0');
+}
+setInterval(tick, 1000);
+
+function show(v){
+  hall.hidden = v !== 'hall'; room.hidden = v !== 'room'; escapeEl.hidden = v !== 'escape';
+  window.scrollTo(0, 0);
+}
+
+function openRoom(i){
+  var p = PR[i], c = CANVA[p.id](S.v);
+  if(!S.start){ S.start = Date.now(); save(); tick(); }
+  room.replaceChildren();
+  var phase = S.solved[p.id] ? 'done' : (S.puz[p.id] ? 'canva' : 'puzzle');
+  var title = h('h2', {tabindex:'-1'}, p.name);
+  var pill1 = h('span', {}, '1 Puzzle'), pill2 = h('span', {}, '2 In Canva');
+  var stage = h('div', {class:'stage'});
+  var canvaBox = h('div', {class:'canva', hidden:''});
+  var msg = h('p', {class:'msg', role:'status', 'aria-live':'polite'});
+  var hintBox = h('p', {class:'hintbox', hidden:''});
+  var hintBtn = h('button', {class:'btn ghost', type:'button'}, 'Need a hint?');
+  var mission = h('p', {class:'mission'}, p.mission);
+  var win = h('div', {class:'win', hidden:''},
+    h('div', {class:'letter'}, p.letter),
+    h('div', {}, h('h3', {}, 'Door open'), h('p', {}, p.takeaway),
+      h('button', {class:'btn', type:'button', onclick:function(){ show('hall'); }}, 'Back to the hall')));
+  var hintRow = h('div', {class:'hintrow'}, hintBtn, hintBox);
+  function setPhase(ph){
+    phase = ph;
+    pill1.className = ph === 'puzzle' ? 'cur' : 'ok'; pill2.className = ph === 'canva' ? 'cur' : ph === 'done' ? 'ok' : '';
+    stage.hidden = ph !== 'puzzle'; canvaBox.hidden = ph !== 'canva'; win.hidden = ph !== 'done'; hintRow.hidden = ph === 'done';
+    mission.hidden = ph !== 'puzzle'; hintBox.hidden = true;
+    if(ph === 'canva') buildCanva();
+  }
+  function buildCanva(){
+    var inp = h('input', {id:'ans_' + p.id, type:'text', autocomplete:'off', 'aria-label':'Your answer', placeholder:'Your answer'});
+    var f = h('form', {}, inp, h('button', {class:'btn teal', type:'submit'}, 'Check answer'));
+    var tries = 0;
+    f.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(canvaCheck(c, inp.value)){ done(); }
+      else { tries++; shake(f); api.say(tries < 2 ? 'Not yet. Check your work in Canva and try again.' : 'Still not matching. Re-read each step, or use the hint.'); }
+    });
+    canvaBox.replaceChildren(h('h3', {}, 'In Canva'),
+      h('p', {}, 'Switch to your Canva tab. Do these steps in your Locked Studio file.'),
+      h('ol', {}, c.steps.map(function(s){ return h('li', {}, s); })),
+      h('p', {class:'q'}, c.q), f);
+    if(TEACHER) canvaBox.append(h('button', {class:'tbtn', type:'button', onclick:function(){ inp.value = c.num != null ? c.num : (c.show || c.any[0]); }}, 'Teacher: fill answer'));
+  }
+  function done(){
+    S.solved[p.id] = true; S.puz[p.id] = true; save(); refresh();
+    msg.textContent = ''; setPhase('done'); win.scrollIntoView({block:'nearest'});
+  }
+  var api = {
+    say: function(t, k){ msg.textContent = t; msg.setAttribute('data-k', k || ''); },
+    puzzleDone: function(){
+      S.puz[p.id] = true; save(); refresh(); msg.textContent = ''; setPhase('canva');
+      canvaBox.scrollIntoView({block:'nearest'});
+    }
+  };
+  hintBtn.addEventListener('click', function(){
+    var key = p.id + ':' + phase;
+    if(!S.hinted[key]){ S.hinted[key] = true; save(); refresh(); }
+    hintBox.textContent = phase === 'canva' ? c.hint : p.hint; hintBox.hidden = false;
+  });
+  room.append(
+    h('button', {class:'back', type:'button', onclick:function(){ show('hall'); }}, '← Back to the hall'),
+    h('p', {class:'kicker'}, GROUPS[p.g]), title, h('div', {class:'steps'}, pill1, pill2), mission,
+    stage, canvaBox, msg, hintRow, win);
+  if(TEACHER && phase === 'puzzle') room.append(h('button', {class:'tbtn', type:'button', onclick:function(){ api.puzzleDone(); }}, 'Teacher: skip puzzle'));
+  if(phase === 'puzzle') p.build(stage, api);
+  setPhase(phase);
+  show('room'); title.focus();
+}
+
+function finish(){
+  if(!S.done){ S.done = true; S.end = Date.now(); save(); }
+  tick(); buildEscape(); show('escape');
+}
+
+function buildEscape(){
+  var t = Math.max(0, Math.floor((S.end - S.start) / 1000));
+  var fmt = Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  var sheet = h('dl', {class:'sheet'});
+  PR.forEach(function(p){ sheet.append(h('div', {}, h('dt', {}, p.name), h('dd', {}, p.takeaway))); });
+  escapeEl.replaceChildren(
+    h('p', {class:'kicker'}, 'Code accepted: ' + CODE),
+    h('h2', {}, 'You made it out.'),
+    h('div', {class:'stats'},
+      h('div', {}, h('span', {class:'lbl'}, 'Escape time (minutes)'), h('div', {style:'font:700 1.8rem var(--display)'}, fmt)),
+      h('div', {}, h('span', {class:'lbl'}, 'Hints used'), h('div', {style:'font:700 1.8rem var(--display)'}, String(nHints())))),
+    h('div', {class:'ask'}, h('h3', {}, 'Before you leave'),
+      h('p', {}, 'Open your Locked Studio file in Canva and pick the page you are proudest of. In three sentences, name the principle that was hardest to get right today and describe one place you will use it in your next design.')),
+    h('h3', {}, 'Your nine-principle cheat sheet'), sheet,
+    h('div', {}, h('button', {class:'btn ghost', type:'button', onclick:reset}, 'Play again')));
+}
+
+function reset(){
+  S = fresh(); save(); exitInput.value = ''; exitMsg.textContent = ''; refresh(); tick(); show('hall');
+}
+var rbtn = document.getElementById('reset'), rtimer;
+rbtn.addEventListener('click', function(){
+  if(rbtn.getAttribute('data-arm')){ rbtn.removeAttribute('data-arm'); rbtn.textContent = 'Start over'; clearTimeout(rtimer); reset(); return; }
+  rbtn.setAttribute('data-arm', '1'); rbtn.textContent = 'Tap again to erase progress';
+  rtimer = setTimeout(function(){ rbtn.removeAttribute('data-arm'); rbtn.textContent = 'Start over'; }, 4000);
+});
+
+refresh(); tick();
+if(S.done){ buildEscape(); show('escape'); } else show('hall');
+})();
+</script>
+</body>
+</html>
