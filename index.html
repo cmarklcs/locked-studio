@@ -869,13 +869,13 @@ var CANVA = {
       hint:'The space between the right edge of the second square and the right edge of the page must equal ' + P[1] + '.'};
   },
   contrast: function(v){
-    var D = [['a soft dark copy of the letters behind them','shadow'],['letters drawn as outlines with a see-through middle','hollow'],['letters that glow like a lit sign','neon']][v];
+    var D = [['a solid colored block behind the letters','background'],['letters drawn as outlines with a see-through middle','hollow'],['letters that glow like a lit sign','neon']][v];
     return {
       steps:['Add a new page. Set the background to a photo: open Photos and search for ocean.',
         'Add a text box that says CONTRAST in white, size 100.',
         'Select the text, then open Effects in the top toolbar.',
         'Find the effect that makes ' + D[0] + '.'],
-      q:'What is the name of that effect?', any:v === 0 ? ['shadow'] : v === 1 ? ['hollow','outline'] : ['neon','glow'],
+      q:'What is the name of that effect?', any:v === 0 ? ['background'] : v === 1 ? ['hollow','outline'] : ['neon','glow'],
       hint:'Hover over the effect tiles. Each one has a name under it.', show:D[1]};
   },
   emphasis: function(v){
