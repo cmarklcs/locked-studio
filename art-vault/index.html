@@ -129,6 +129,11 @@ h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1;font-weight:800;margin-top:6
 .sheet dd{margin:0}
 .ask{background:var(--paper);color:var(--ink);border-radius:10px;padding:18px}
 .ask h3{font-size:1.2rem;margin-bottom:6px}
+.reveal{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:18px}
+.reveal>div:last-child{flex:1 1 260px;display:grid;gap:8px;min-width:0}
+.reveal h3{color:var(--gold);font-size:1.3rem}
+.rv-art{flex:0 1 320px;width:320px;max-width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.rv-art svg{display:block;width:100%;height:100%}
 
 footer{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--muted);font-size:14px}
 footer span{max-width:60ch}
@@ -200,7 +205,7 @@ footer span{max-width:60ch}
     <div>
       <p class="kicker">Elements of Design · Grade 7</p>
       <h1>The Art Vault</h1>
-      <p class="lede">The museum has closed and you are locked in the vault. Seven display cases hold the seven elements of design. Each case has a puzzle on this page and a task in Canva. Finish both to earn a letter. The letters are scrambled, so unscramble them to get the code.</p>
+      <p class="lede">The museum has closed and you are locked in the vault. Seven display cases hold the seven elements of design. Each case has a puzzle on this page and a task in Canva. Finish both to earn a letter. Every Canva task adds a piece to one secret picture, so you will not know what you made until the end. The letters are scrambled, so unscramble them to get the code.</p>
     </div>
     <div class="meter" aria-label="Progress">
       <div><span class="lbl">Time</span><b id="clock">0:00</b></div>
@@ -548,85 +553,112 @@ function buildSpace(st, api){
   });
 }
 
-/* ---------- Canva tasks (numbers change by student version v = 0, 1 or 2) ---------- */
+/* ---------- Canva tasks: every case adds one piece to the same secret picture on page 1 ----------
+   The picture is a sunset over mountains. Pieces are placed by exact X and Y, so the cases can be done in any order.
+   The sky is sent To back and the ground photo is the page background, so later pieces always land on top of them.
+   Numbers change by student version v = 0, 1 or 2. SCENE(v) draws the finished picture for the escape screen. */
+var SUN = '#F28C28';
+var VER = {
+  rays:[30,45,60],
+  sky:[[5,20,4],[6,15,5],[4,25,3]],         // bands, transparency step, band asked about
+  balloon:[['red','#E53935'],['blue','#1E88E5'],['green','#43A047']],
+  ground:[['grassy field','#7aa35a'],['desert sand','#d9b77a'],['autumn leaves','#c46a2b']],
+  tree:[240,200,160]
+};
 var CANVA = {
   line: function(v){
-    var A = [30,45,60][v];
+    var A = VER.rays[v];
     return {
-      steps:['Add a new page to your 1000 × 1000 px design.',
-        'Open Elements, find Lines, and add a straight line.',
-        'Select the line, open Position, then Advanced. Set Rotate to ' + A + '. Now it is a diagonal line.',
-        'Add a second line that crosses the first one at a right angle (a perfect corner, like a plus sign that has been tilted).'],
+      steps:['Open Elements, find Lines, and add a straight line.',
+        'Click the line style button in the top toolbar and set Line weight to 12. Color the line ' + SUN + ' (type it in the color box).',
+        'Open Position, then Advanced. Set Width to 320, X to 650, Y to 144 and Rotate to ' + A + '. Now it is a diagonal line.',
+        'Duplicate the line (Ctrl+D or Cmd+D). Give the copy the same X and Y, then rotate it so it crosses the first line at a right angle.'],
       q:'What Rotate number did you give the second line?', nums:[A + 90, A + 270, A - 90],
       hint:'A right angle is 90 degrees. Add 90 to ' + A + '.', show:A + 90};
   },
-  shape: function(v){
-    var N = [[3,2],[4,3],[2,4]][v];
+  shape: function(){
     return {
-      steps:['Add a new page.',
-        'Add ' + N[0] + ' geometric shapes from Elements, then Shapes (circles, squares, triangles and so on).',
-        'Add ' + N[1] + ' organic shapes. In Elements, search for blob.',
-        'Select only the organic shapes (hold Shift and click each one) and group them. Use the Group button or press Ctrl+G (Cmd+G on a Mac).',
-        'Select any element, open Position, and find the Layers tab.'],
-      q:'How many layers are listed now?', num:N[0] + 1,
-      hint:'A group counts as one layer. Add the ' + N[0] + ' geometric shapes to it.'};
+      steps:['Add a triangle from Elements, then Shapes. Color it #3B3F7A.',
+        'Open Position, then Advanced. Click the lock between Width and Height to unlock it. Set Width 500, Height 300, X 0, Y 300.',
+        'Add a second triangle colored #2B2D5B. Set Width 650, Height 350, X 350, Y 250.',
+        'In Elements, search for cloud and add a cloud shape. Make it white and set Width to 260, X to 80 and Y to 80.'],
+      q:'Your mountains are triangles. Is a triangle a geometric shape or an organic shape?', any:['geometric'],
+      hint:'Could you draw a triangle with a ruler?', show:'geometric'};
   },
   form: function(v){
-    var C = [['teal','#1F6F78'],['orange','#E07B39'],['purple','#6027A8']][v];
+    var C = VER.balloon[v];
     return {
-      steps:['Add a new page and a circle from Elements, then Shapes.',
-        'Select the circle and click the color square in the top toolbar.',
-        'Open the Gradient options. Pick white for one end and ' + C[0] + ' (' + C[1] + ') for the other.',
-        'Try each gradient style. Find the one that makes the circle look like a 3D ball with light shining on it.'],
+      steps:['Add a circle from Elements, then Shapes.',
+        'Open Position, then Advanced. Set Width and Height to 160, X to 380 and Y to 120.',
+        'Click the color square in the top toolbar and open the Gradient options. Pick white for one end and ' + C[0] + ' (' + C[1] + ') for the other.',
+        'Try each gradient style until the circle looks like a 3D ball with light on it. It is a hot-air balloon.'],
       q:'Which kind of gradient made it look like a ball: linear (straight bands of color) or radial (color spreading out from a center point)?', any:['radial'],
       hint:'A ball is brightest at one spot and gets darker all the way around it.', show:'radial'};
   },
   color: function(v){
-    var P = [['red','#FF0000','yellow','#FFFF00','orange'],['yellow','#FFFF00','blue','#0000FF','green'],['blue','#0000FF','red','#FF0000','purple']][v];
-    return {
-      steps:['Add a new page and two squares, side by side.',
-        'Select the first square, click the color square in the top toolbar, and type ' + P[1] + ' in the box (that is ' + P[0] + ').',
-        'Make the second square ' + P[3] + ' (' + P[2] + ').',
-        'Add a third square below them. Give it the color you get when you mix ' + P[0] + ' and ' + P[2] + '. Use the color picker.'],
-      q:'What color did you make the third square?', any:v === 2 ? ['purple','violet'] : [P[4]],
-      hint:'These are primary colors. Mixing two primaries makes a secondary color.', show:P[4]};
+    var Q = [['This orange is a mix of which two primary colors?', {all:['red','yellow']}, 'red and yellow', 'Primary colors are red, yellow and blue. Which two make orange?'],
+             ['Orange is the complement of which primary color?', {any:['blue']}, 'blue', 'The complement sits across the color wheel. It is the primary color not used to make orange.'],
+             ['Is orange a warm color or a cool color?', {any:['warm']}, 'warm', 'Would orange feel hot or cold if it were the weather?']][v];
+    var c = {
+      steps:['Add a circle from Elements, then Shapes.',
+        'Open Position, then Advanced. Set Width and Height to 220, X to 700 and Y to 40.',
+        'Click the color square in the top toolbar and type ' + SUN + '. This is the sun.'],
+      q:Q[0], hint:Q[3], show:Q[2]};
+    c.any = Q[1].any; c.all = Q[1].all;
+    return c;
   },
   value: function(v){
-    var C = [[5,25,3],[6,20,4],[5,20,5]][v], N = C[0], step = C[1], k = C[2];
+    var C = VER.sky[v], N = C[0], step = C[1], k = C[2], bh = 600 / N;
     return {
-      steps:['Add a new page and ' + N + ' black squares in a row.',
-        'Select the first square and click the Transparency button (the checkerboard) in the top toolbar. Leave it at 100.',
-        'Make each next square ' + step + ' less: ' + Array.apply(null, Array(N)).map(function(_, i){ return i < 2 ? String(100 - i * step) : null; }).filter(Boolean).join(', ') + ', and so on. Now you have a value scale from dark to light.'],
-      q:'What transparency number did you give square number ' + k + '?', num:100 - (k - 1) * step,
-      hint:'Start at 100 and take away ' + step + ' for each square after the first.'};
+      steps:['Add a square from Elements, then Shapes. Make it white. Unlock Width and Height in Position, then Advanced, and set Width 1000, Height 600, X 0, Y 0.',
+        'Add ' + N + ' rectangles colored #2B1B5A. Each one is Width 1000 and Height ' + bh + '. Stack them from the top: Y is 0, ' + bh + ', ' + (2 * bh) + ' and so on.',
+        'Use the Transparency button (the checkerboard) in the top toolbar. Leave the top band at 100, then make each band below ' + step + ' less. The sky now fades from dark to light.',
+        'Select the white square and all the bands, group them, then open Position and click To back.'],
+      q:'What transparency number did you give band number ' + k + ' (counting from the top)?', num:100 - (k - 1) * step,
+      hint:'Start at 100 and take away ' + step + ' for each band after the first.'};
   },
   texture: function(v){
-    var P = ['tree bark','sand','brick wall'][v];
+    var P = VER.ground[v][0];
     return {
-      steps:['Add a new page.',
-        'Open Photos and search for ' + P + '. Add a photo you like.',
-        'Right-click the photo and choose Set image as background.',
-        'Add a text box that says TEXTURE on top. Make it big and easy to read.'],
+      steps:['Open Photos and search for ' + P + '. Add a photo you like.',
+        'Right-click the photo and choose Set image as background. The bottom part of it is now the ground.',
+        'Zoom in on the ground. You can see its texture.'],
       q:'You can see the bumps on your screen, but you cannot feel them. Is this actual texture or implied texture?', any:['implied'],
       hint:'If you touch your screen, does it feel like ' + P + '?', show:'implied'};
   },
   space: function(v){
-    var B = [400,300,480][v];
+    var B = VER.tree[v];
     return {
-      steps:['Add a new page. Open Elements and search for tree. Add one tree.',
-        'Select it, open Position, then Advanced. Set its Height to ' + B + '. This is your near tree.',
-        'Add a second tree. Make its Height half of the near tree, and move it higher on the page.',
-        'Add a third tree that is half the size of the second one, even higher on the page. Use Position to send it Backward if it covers another tree.'],
+      steps:['Open Elements and search for tree. Add one tree.',
+        'Open Position, then Advanced. Keep Width and Height locked. Set Height to ' + B + ', X to 60 and Y to ' + (990 - B) + '. This is your near tree.',
+        'Add a second tree. Make its Height half of the near tree. Set X to 280 and Y to ' + (790 - B / 2) + '.',
+        'Add a third tree that is half the height of the second one. Set X to 440 and Y to ' + (660 - B / 4) + '.'],
       q:'What Height did you give the third tree?', num:B / 4,
       hint:'Half of ' + B + ' is ' + (B / 2) + '. Then take half again.'};
   }
 };
+function SCENE(v){
+  var sky = VER.sky[v], N = sky[0], bh = 600 / N, bands = '', A = VER.rays[v], B = VER.tree[v], bc = VER.balloon[v][1], g = VER.ground[v][1];
+  for(var i = 0; i < N; i++) bands += '<rect x="0" y="' + (i * bh) + '" width="1000" height="' + (bh + 1) + '" fill="#2B1B5A" fill-opacity="' + (100 - i * sky[1]) / 100 + '"/>';
+  function ray(a){ return '<line x1="650" y1="150" x2="970" y2="150" stroke="' + SUN + '" stroke-width="12" transform="rotate(' + a + ' 810 150)"/>'; }
+  function tree(x, y, hgt){ var w = hgt * .6; return '<rect x="' + (x + w * .43) + '" y="' + (y + hgt * .75) + '" width="' + (w * .14) + '" height="' + (hgt * .25) + '" fill="#5b3b22"/><polygon points="' + (x + w / 2) + ',' + y + ' ' + (x + w) + ',' + (y + hgt * .78) + ' ' + x + ',' + (y + hgt * .78) + '" fill="#2f6b3a"/>'; }
+  return '<svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sunset over the mountains">' +
+    '<defs><radialGradient id="bal" cx=".35" cy=".35" r=".75"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="' + bc + '"/></radialGradient>' +
+    '<pattern id="gnd" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="' + g + '"/><path d="M4 20 l3 -8 M14 22 l2 -9 M20 14 l2 -6" stroke="#0002" stroke-width="2"/></pattern></defs>' +
+    '<rect width="1000" height="1000" fill="url(#gnd)"/><rect width="1000" height="600" fill="#fff"/>' + bands +
+    '<polygon points="0,600 250,300 500,600" fill="#3B3F7A"/><polygon points="350,600 675,250 1000,600" fill="#2B2D5B"/>' +
+    '<path d="M110 220 C70 220 70 170 110 165 C110 110 190 100 210 145 C240 110 320 130 310 180 C350 185 345 220 310 220 Z" fill="#fff"/>' +
+    '<circle cx="460" cy="200" r="80" fill="url(#bal)"/>' +
+    ray(A) + ray(A + 90) + '<circle cx="810" cy="150" r="110" fill="' + SUN + '"/>' +
+    tree(60, 990 - B, B) + tree(280, 790 - B / 2, B / 2) + tree(440, 660 - B / 4, B / 4) + '</svg>';
+}
 function canvaCheck(c, raw){
   var t = String(raw).toLowerCase().trim(); if(!t) return false;
   var m = t.replace(/,/g, '').match(/-?\d+(\.\d+)?/);
   if(c.num != null) return !!m && Number(m[0]) === c.num;
   if(c.nums) return !!m && c.nums.indexOf(Number(m[0])) > -1;
   if(c.any) return c.any.some(function(w){ return t.indexOf(w) > -1; });
+  if(c.all) return c.all.every(function(w){ return t.indexOf(w) > -1; });
   return false;
 }
 
@@ -679,7 +711,7 @@ hall.append(h('details', {class:'setup', open:''},
     h('li', {}, 'Open canva.com and sign in with your school account.'),
     h('li', {}, 'Click Create a design, then Custom size.'),
     h('li', {}, 'Type 1000 by 1000 and choose px as the unit. Click Create new design.'),
-    h('li', {}, 'Name the file Art Vault and add your name. Keep that tab open. Add a new page for each case.'))));
+    h('li', {}, 'Name the file Art Vault and add your name. Keep that tab open. Do every Canva task on this one page. Do not add new pages.'))));
 
 var GROUPS = ['Building blocks', 'Light & color', 'Surface & depth'];
 GROUPS.forEach(function(g, gi){
@@ -774,7 +806,7 @@ function openRoom(i){
       else { tries++; shake(f); api.say(tries < 2 ? 'Not yet. Check your work in Canva and try again.' : 'Still not matching. Re-read each step, or use the hint.'); }
     });
     canvaBox.replaceChildren(h('h3', {}, 'In Canva'),
-      h('p', {}, 'Switch to your Canva tab. Do these steps in your Art Vault file.'),
+      h('p', {}, 'Switch to your Canva tab. Do these steps on the one page of your Art Vault file. Use the exact numbers so your piece lands in the right spot.'),
       h('ol', {}, c.steps.map(function(s){ return h('li', {}, s); })),
       h('p', {class:'q'}, c.q), f);
     if(TEACHER) canvaBox.append(h('button', {class:'tbtn', type:'button', onclick:function(){ inp.value = c.num != null ? c.num : c.show; }}, 'Teacher: fill answer'));
@@ -821,10 +853,15 @@ function buildEscape(){
     h('div', {class:'stats'},
       h('div', {}, h('span', {class:'lbl'}, 'Escape time (minutes)'), h('div', {style:'font:800 1.8rem var(--display)'}, fmt)),
       h('div', {}, h('span', {class:'lbl'}, 'Hints used'), h('div', {style:'font:800 1.8rem var(--display)'}, String(nHints())))),
+    h('div', {class:'reveal'}, h('div', {class:'rv-art'}),
+      h('div', {}, h('h3', {}, 'Your hidden picture: a sunset over the mountains'),
+        h('p', {}, 'Go back to your Canva page. It should look like this, with your own photo, cloud and trees. If a piece is missing or in the wrong place, check its numbers.'),
+        h('p', {}, 'Then download it: click Share, then Download, and choose PNG.'))),
     h('div', {class:'ask'}, h('h3', {}, 'Before you leave'),
-      h('p', {}, 'Open your Art Vault file in Canva and pick your favorite page. Write two sentences: which element of design it shows best, and how you used it.')),
+      h('p', {}, 'Look at your finished picture. Write two sentences: which element of design stands out most in it, and why.')),
     h('h3', {}, 'Your seven-element cheat sheet'), sheet,
     h('div', {}, h('button', {class:'btn ghost', type:'button', onclick:reset}, 'Play again')));
+  escapeEl.querySelector('.rv-art').innerHTML = SCENE(S.v);
 }
 
 function reset(){
