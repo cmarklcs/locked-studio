@@ -117,6 +117,14 @@ h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1;font-weight:800;margin-top:6
 .canva h3{font-size:1.4rem;color:var(--gold)}
 .canva ol{margin:0;padding-left:22px;display:grid;gap:6px}
 .canva .q{font-weight:700;margin-top:4px}
+.nums{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.num{background:var(--bg);border:1px solid var(--gold-line);border-radius:6px;padding:2px 10px;font-variant-numeric:tabular-nums;font-weight:700}
+.num b{color:var(--gold);font-weight:700}
+.chelp{border-top:1px solid var(--gold-line);padding-top:10px}
+.chelp summary{cursor:pointer;font-weight:700;color:var(--gold)}
+.chelp dl{display:grid;gap:8px;margin:10px 0 0}
+.chelp dt{font-weight:700}
+.chelp dd{margin:0;color:var(--muted)}
 .canva form{display:flex;gap:10px;flex-wrap:wrap}
 .canva input{flex:1 1 160px;min-width:0;background:var(--bg);color:var(--text);border:1.5px solid var(--gold-line);border-radius:8px;padding:10px 12px;font:700 1.05rem var(--body)}
 .tbtn{background:none;border:1px dashed var(--line);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;align-self:flex-start}
@@ -571,34 +579,43 @@ var VER = {
   ground:[['snowy forest','#e8f0f4'],['pine forest','#5f7f5a'],['autumn forest','#c98a4a']],
   tree:[240,200,160]
 };
+// A step is plain text, or [text, {Field:value}] when the student types numbers into Position, then Advanced.
 var CANVA = {
   line: function(v){
-    var A = VER.whisker[v];
+    var Q = [['Your whiskers tilt. Are they horizontal, vertical or diagonal lines?', 'diagonal', 'Lines that tilt, like a slide, are diagonal.'],
+             ['Your ear tufts stand straight up. Are they horizontal, vertical or diagonal lines?', 'vertical', 'Lines that stand straight up, like a tree trunk, are vertical.'],
+             ['Your whiskers tilt. Are they horizontal, vertical or diagonal lines?', 'diagonal', 'Lines that tilt, like a slide, are diagonal.']][v];
     return {
-      steps:['Open Elements, find Lines, and add a straight line. Click the line style button in the top toolbar and set Line weight to 8. Color it ' + DARK + '.',
-        'Open Position, then Advanced. Set Width to 240, X to 210, Y to 656 and Rotate to ' + A + '. This is a whisker.',
-        'Duplicate it (Ctrl+D or Cmd+D). Give the copy the same X and Y, then rotate it so it tilts the other way by the same amount.',
-        'Select both whiskers, duplicate them, and set X to 550 so the other cheek gets whiskers too.',
-        'Add one more line, Width 80, and set Rotate to 90 so it stands straight up. Place it at X 280, Y 116. Duplicate it and place the copy at X 640, Y 116.'],
-      q:'What Rotate number did you give the second whisker?', nums:[360 - A, -A],
-      hint:'Tilting the other way means going below zero. Canva counts all the way around to 360, so try 360 minus ' + A + '.', show:360 - A};
+      steps:['Press L on your keyboard to add a line. (Or open Elements, choose Shapes, then Lines.)',
+        'With the line selected, click Line weight in the toolbar and drag it to about 8. Click the Color tile and pick a dark brown or black.',
+        ['Click Position, then set these numbers under Advanced. This is one whisker.', {Width:240, X:210, Y:656}],
+        'Drag one end of the whisker up a little so it tilts.',
+        'Copy the whisker (right-click it and choose Duplicate). Drag one end of the copy down a little so it tilts the other way.',
+        'Make two more whiskers the same way and drag them onto the right cheek.',
+        'Add two short lines that stand straight up. Drag one onto the tip of each ear. These are the Lynx’s ear tufts.'],
+      q:Q[0], any:[Q[1]], hint:Q[2], show:Q[1]};
   },
   shape: function(){
     return {
-      steps:['Add a triangle from Elements, then Shapes. Color it ' + FUR + '.',
-        'Open Position, then Advanced. Click the lock between Width and Height to unlock it. Set Width 200, Height 260, X 220, Y 160.',
-        'Add a smaller triangle colored #5A3A22. Unlocked, set Width 80, Height 110, X 280, Y 210.',
-        'Select both triangles, group them, duplicate the group, and set the copy’s X to 580.'],
+      steps:['Open Elements, choose Shapes, and add a triangle.',
+        'Click the Color tile, click +, and type ' + FUR.slice(1) + ' in the color code box.',
+        ['Click Position. Under Advanced, click Ratio to turn it off (so you can stretch the shape), then type these numbers. This is the left ear.', {Width:200, Height:260, X:220, Y:160}],
+        ['Add a second triangle colored 5A3A22 (dark brown). Turn Ratio off and type these numbers. This is the inside of the ear.', {Width:80, Height:110, X:280, Y:210}],
+        'Hold Shift and click both triangles. Click Group.',
+        ['Right-click the group and choose Duplicate. Click Position and change only X. This is the right ear.', {X:580, Y:160}]],
       q:'You used triangles. Is a triangle a geometric shape or an organic shape?', any:['geometric'],
       hint:'Could you draw a triangle with a ruler?', show:'geometric'};
   },
   form: function(v){
     var C = VER.eye[v];
     return {
-      steps:['Add a circle from Elements, then Shapes. In Position, then Advanced, set Width and Height to 120, X to 330 and Y to 470.',
-        'Click the color square in the top toolbar and open the Gradient options. Pick white for one end and ' + C[0] + ' (' + C[1] + ') for the other. Try each gradient style until the circle looks like a shiny 3D ball.',
-        'Add a black circle on top with Width and Height 40, X 370 and Y 510.',
-        'Select both circles, group them, duplicate the group, and set the copy’s X to 550.'],
+      steps:[['Open Elements, choose Shapes, and add a circle. Click Position and type these numbers.', {Width:120, Height:120, X:330, Y:470}],
+        'Click the Color tile. Under Document colors, click +, then click the Gradient tab.',
+        'Click each end of the gradient bar to set its color: make one end white (FFFFFF) and the other ' + C[0] + ' (' + C[1].slice(1) + ').',
+        'Under Styles, try each style until the circle looks like a shiny 3D ball. This is an eye.',
+        ['Add a small black circle for the pupil.', {Width:40, Height:40, X:370, Y:510}],
+        'Hold Shift, click the eye and the pupil, and click Group.',
+        ['Right-click the group and choose Duplicate. Click Position and change only X. This is the other eye.', {X:550, Y:470}]],
       q:'Which kind of gradient made it look like a ball: linear (straight bands of color) or radial (color spreading out from a center point)?', any:['radial'],
       hint:'A ball is brightest at one spot and gets darker all the way around it.', show:'radial'};
   },
@@ -607,10 +624,10 @@ var CANVA = {
              ['This tan is a kind of orange. Orange is the complement of which primary color?', {any:['blue']}, 'blue', 'The complement sits across the color wheel. It is the primary color not used to make orange.'],
              ['This tan is a kind of orange. Which two primary colors make orange?', {all:['red','yellow']}, 'red and yellow', 'Primary colors are red, yellow and blue. Which two make orange?']][v];
     var c = {
-      steps:['Add a circle from Elements, then Shapes.',
-        'Open Position, then Advanced. Set Width and Height to 560, X to 220 and Y to 280.',
-        'Click the color square in the top toolbar and type ' + FUR + '.',
-        'Open Position and click To back, so every other piece sits on top of it.'],
+      steps:['Open Elements, choose Shapes, and add a circle.',
+        ['Click Position and type these numbers under Advanced. This is the Lynx’s head.', {Width:560, Height:560, X:220, Y:280}],
+        'Click the Color tile, click +, and type ' + FUR.slice(1) + ' in the color code box.',
+        'Click Position again and choose To back, so every other piece sits on top of the head.'],
       q:Q[0], hint:Q[3], show:Q[2]};
     c.any = Q[1].any; c.all = Q[1].all;
     return c;
@@ -618,33 +635,44 @@ var CANVA = {
   value: function(v){
     var T = VER.puff[v];
     return {
-      steps:['Add a white circle with Width and Height 160 at X 340, Y 580. Duplicate it and set the copy’s X to 500. These are the cheeks.',
-        'Select both cheeks, click the Transparency button (the checkerboard) in the top toolbar, and set it to ' + T + '.',
-        'Add a white circle for the chin: Width and Height 120, X 440, Y 700. Make it 20 less transparent than the cheeks so it is a slightly darker value.',
-        'Add a triangle colored ' + DARK + '. Unlock Width and Height, and set Width 90, Height 60, X 455, Y 600, Rotate 180. This dark nose is the lowest value on the face.'],
-      q:'What transparency number did you give the chin?', num:T - 20,
+      steps:[['Open Elements, choose Shapes, and add a circle. Make it white. Click Position and type these numbers. This is the left cheek.', {Width:160, Height:160, X:340, Y:580}],
+        ['Right-click it, choose Duplicate, and change only X. This is the right cheek.', {X:500, Y:580}],
+        'Hold Shift and click both cheeks. Click Transparency (the checkerboard button) and type ' + T + '.',
+        ['Add another white circle for the chin.', {Width:120, Height:120, X:440, Y:700}],
+        'Set the chin’s Transparency to 20 less than the cheeks, so it is a little darker.',
+        ['Add a triangle colored ' + DARK.slice(1) + ' (very dark brown). Turn Ratio off and type these numbers. This is the nose.', {Width:90, Height:60, X:455, Y:600}],
+        'Turn the nose upside down: type 180 in Rotate under Advanced, or click Flip and choose Flip vertical.'],
+      q:'What Transparency number did you give the chin?', num:T - 20,
       hint:T + ' take away 20.'};
   },
   texture: function(v){
     var P = VER.ground[v][0];
     return {
-      steps:['Open Photos and search for ' + P + '. Add a photo you like.',
+      steps:['Click Elements and search for ' + P + '. Click the Photos tab and add a photo you like.',
         'Right-click the photo and choose Set image as background.',
-        'Zoom in on the photo. You can see its texture.'],
+        'Zoom in on the photo. Look at its texture.'],
       q:'You can see the texture on your screen, but you cannot feel it. Is this actual texture or implied texture?', any:['implied'],
       hint:'If you touch your screen, does it feel like a ' + P + '?', show:'implied'};
   },
   space: function(v){
     var B = VER.tree[v];
     return {
-      steps:['Open Elements and search for tree. Add one tree.',
-        'Open Position, then Advanced. Keep Width and Height locked. Set Height to ' + B + ', X to 20 and Y to ' + (990 - B) + '. This is the near tree.',
-        'Add a second tree. Make its Height half of the near tree. Set X to 830 and Y to ' + (700 - B / 2) + '.',
-        'Add a third tree that is half the height of the second one. Set X to 160 and Y to ' + (450 - B / 4) + '.'],
+      steps:['Click Elements, search for tree, and add a tree from the Graphics results.',
+        ['Click Position. Leave Ratio on, type the Height (the Width changes by itself), then type X and Y. This is the near tree.', {Height:B, X:20, Y:990 - B}],
+        ['Add a second tree. Make its Height half of the near tree.', {Height:'?', X:830, Y:700 - B / 2}],
+        ['Add a third tree. Make its Height half of the second tree.', {Height:'?', X:160, Y:450 - B / 4}]],
       q:'What Height did you give the third tree?', num:B / 4,
       hint:'Half of ' + B + ' is ' + (B / 2) + '. Then take half again.'};
   }
 };
+var CANVA_HELP = [
+  ['Position', 'In the toolbar above your page. If you don’t see it, click ⋯ (More) at the end of the toolbar.'],
+  ['Advanced', 'Inside Position, under the Arrange tab. It has Width, Height, X, Y and Rotate. Click a box, type the number and press Enter.'],
+  ['Ratio', 'The button between Width and Height. When it is on, the shape keeps its proportions. Turn it off to stretch a shape.'],
+  ['Color tile', 'The colored square at the left of the toolbar. Click + to type a color code.'],
+  ['Transparency', 'The checkerboard button in the toolbar. If you don’t see it, click ⋯ (More).'],
+  ['Duplicate and Group', 'Right-click an element for Duplicate. Hold Shift to select several, then click Group in the toolbar.']
+];
 function SCENE(v){
   var A = VER.whisker[v], B = VER.tree[v], ec = VER.eye[v][1], g = VER.ground[v][1], T = VER.puff[v] / 100, T2 = (VER.puff[v] - 20) / 100;
   function tree(x, y, hgt){ var w = hgt * .6; return '<rect x="' + (x + w * .43) + '" y="' + (y + hgt * .75) + '" width="' + (w * .14) + '" height="' + (hgt * .25) + '" fill="#5b3b22"/><polygon points="' + (x + w / 2) + ',' + y + ' ' + (x + w) + ',' + (y + hgt * .78) + ' ' + x + ',' + (y + hgt * .78) + '" fill="#2f6b3a"/>'; }
@@ -818,8 +846,13 @@ function openRoom(i){
       else { tries++; shake(f); api.say(tries < 2 ? 'Not yet. Check your work in Canva and try again.' : 'Still not matching. Re-read each step, or use the hint.'); }
     });
     canvaBox.replaceChildren(h('h3', {}, 'In Canva'),
-      h('p', {}, 'Switch to your Canva tab. Do these steps on the one page of your Art Vault file. Use the exact numbers so your piece lands in the right spot.'),
-      h('ol', {}, c.steps.map(function(s){ return h('li', {}, s); })),
+      h('p', {}, 'Switch to your Canva tab and work on the one page of your Art Vault file. When you see number boxes, select the piece, click Position, and type each number under Advanced.'),
+      h('ol', {}, c.steps.map(function(s){
+        if(typeof s === 'string') return h('li', {}, s);
+        return h('li', {}, s[0], h('span', {class:'nums'}, Object.keys(s[1]).map(function(k){ return h('span', {class:'num'}, h('b', {}, k), ' ' + s[1][k]); })));
+      })),
+      h('details', {class:'chelp'}, h('summary', {}, 'Can’t find a button? Where things are in Canva'),
+        h('dl', {}, CANVA_HELP.map(function(x){ return h('div', {}, h('dt', {}, x[0]), h('dd', {}, x[1])); }))),
       h('p', {class:'q'}, c.q), f);
     if(TEACHER) canvaBox.append(h('button', {class:'tbtn', type:'button', onclick:function(){ inp.value = c.num != null ? c.num : c.show; }}, 'Teacher: fill answer'));
   }
