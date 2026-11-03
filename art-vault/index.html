@@ -196,6 +196,11 @@ footer span{max-width:60ch}
   .crow>b{flex:1 1 100%}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+dialog.confirm{max-width:min(440px,calc(100vw - 32px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+dialog.confirm::backdrop{background:rgba(5,8,15,.7)}
+dialog.confirm h2{font-size:1.5rem;margin-bottom:8px}
+.confirm-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn.danger{background:#c0392b;color:#fff}
 </style>
 </head>
 <body>
@@ -867,19 +872,31 @@ function buildEscape(){
     h('div', {class:'ask'}, h('h3', {}, 'Before you leave'),
       h('p', {}, 'Look at your finished picture. Write two sentences: which element of design stands out most in it, and why.')),
     h('h3', {}, 'Your seven-element cheat sheet'), sheet,
-    h('div', {}, h('button', {class:'btn ghost', type:'button', onclick:reset}, 'Play again')));
+    h('div', {}, h('button', {class:'btn ghost', type:'button', onclick:askReset}, 'Play again')));
   escapeEl.querySelector('.rv-art').innerHTML = SCENE(S.v);
 }
 
 function reset(){
   S = fresh(); save(); exitInput.value = ''; exitMsg.textContent = ''; refresh(); tick(); show('hall');
 }
-var rbtn = document.getElementById('reset'), rtimer;
-rbtn.addEventListener('click', function(){
-  if(rbtn.getAttribute('data-arm')){ rbtn.removeAttribute('data-arm'); rbtn.textContent = 'Start over'; clearTimeout(rtimer); reset(); return; }
-  rbtn.setAttribute('data-arm', '1'); rbtn.textContent = 'Tap again to erase progress';
-  rtimer = setTimeout(function(){ rbtn.removeAttribute('data-arm'); rbtn.textContent = 'Start over'; }, 4000);
-});
+/* Are-you-sure popup before any reset. Cancel has focus, so pressing Enter or Escape keeps progress. */
+var keepBtn = h('button', {class:'btn', type:'button'}, 'No, keep my progress');
+var eraseBtn = h('button', {class:'btn danger', type:'button'}, 'Yes, start over');
+var askText = h('p', {});
+var askBox = h('dialog', {class:'confirm', 'aria-labelledby':'confirm-t'}, h('h2', {id:'confirm-t'}, 'Start over?'), askText,
+  h('div', {class:'confirm-btns'}, keepBtn, eraseBtn));
+document.body.append(askBox);
+keepBtn.addEventListener('click', function(){ askBox.close(); });
+eraseBtn.addEventListener('click', function(){ askBox.close(); reset(); });
+askBox.addEventListener('click', function(e){ if(e.target === askBox) askBox.close(); });
+function askReset(){
+  var n = count();
+  askText.textContent = 'This erases everything you have done: ' + n + ' of ' + PR.length + ' letter' + (PR.length === 1 ? '' : 's') + ', your time and your hints. You cannot undo it.';
+  if(typeof askBox.showModal === 'function') askBox.showModal();
+  else if(window.confirm('Start over? ' + askText.textContent)) reset();
+  keepBtn.focus();
+}
+document.getElementById('reset').addEventListener('click', askReset);
 
 refresh(); tick();
 if(S.done){ buildEscape(); show('escape'); } else show('hall');
